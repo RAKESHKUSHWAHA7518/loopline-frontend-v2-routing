@@ -1,0 +1,28 @@
+[vite] connecting...
+[vite] connected.
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+Error fetching data: 
+_FirebaseError {code: "permission-denied", customData: undefined, name: "FirebaseError", toString: ƒ}
+code: "permission-denied"
+customData: undefined
+name: "FirebaseError"
+toString: ƒ () => `${this.name}: [code=${this.code}]: ${this.message}`
+message: "Missing or insufficient permissions."
+stack: "FirebaseError: Missing or insufficient permissions."
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Error initiating subscription: 
+Error {}
+message: "Failed to create subscription session"
+stack: "Error: Failed to create subscription session↵ at initiateSubscription (https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/src/lib/stripe.ts:23:13)↵ at async handleSubscribe (https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/src/components/SubscriptionButton.tsx:36:27)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+at t.value (https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://af5a2b25-4a44-4a3d-8a9b-42ead6f3dfb1-00-2ynkq1te2yl7l.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
