@@ -316,95 +316,182 @@ export function KnowledgeBase() {
   };
 
   return (
-    <div>
-      <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
+    // <div>
+    //   <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
+    //     <div>
+    //       <h1 className="text-4xl font-medium mb-4">Knowledge base</h1>
+    //       <p className="text-xl font-medium">
+    //         Centralize all your company's knowledge in{" "}
+    //         <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">
+    //           one powerful database
+    //         </span>
+    //         . This ensures our AI bots are perfectly trained{" "}
+    //         <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">
+    //           to provide seamless support
+    //         </span>{" "}
+    //         and help your customers like never before!
+    //       </p>
+    //     </div>
+    //     <button
+    //       onClick={() => setIsCreateDialogOpen(true)}
+    //       className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+    //     >
+    //       <Plus size={16} />
+    //       <span className="block w-max">Create database</span>
+    //     </button>
+    //   </div>
+
+    //   {error && (
+    //     <div className="bg-red-50 text-red-600 text-xs px-2 py-1.5 rounded-lg mb-6">
+    //       {error}
+    //     </div>
+    //   )}
+
+    //   {loading ? (
+    //     <div className="text-center py-12 text-sm"> <RippleLoader/></div>
+    //   ) : knowledgeBases.length === 0 ? (
+    //     <div className="flex items-center justify-center h-[50vh]">
+    //       <p className="text-gray-500 text-lg">No knowledge bases found</p>
+    //     </div>
+    //   ) : (
+    //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    //       {knowledgeBases.map((kb) => (
+    //         <div
+    //           key={kb.knowledge_base_id}
+    //           className="bg-white rounded-[20px] p-6 pt-9 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-6 relative overflow-hidden"
+    //           style={{ pointerEvents: actionLoading[`delete-${kb.knowledge_base_id}`] ? 'none' : 'auto', opacity: actionLoading[`delete-${kb.knowledge_base_id}`] ? 0.5 : 1 }}
+    //         >
+    //           <div className="absolute top-0 right-0">
+    //             <div className={`pl-2 pr-4 py-0.25 rounded-sm text-[10px] font-medium ${
+    //               kb.status === "complete" 
+    //                 ? "bg-green-100 text-green-700" 
+    //                 : "bg-yellow-100 text-yellow-700"
+    //             }`}>
+    //               {kb.status === "complete" ? "Complete" : "In Progress"}
+    //             </div>
+    //           </div>
+    //           <div className="flex items-start space-x-3">
+    //             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+    //               📄
+    //             </div>
+    //             <div className="flex-1 min-w-0">
+    //               <h3 className="text-xs font-medium truncate mb-1">
+    //                 {kb.knowledge_base_name}
+    //               </h3>
+    //               <p className="text-[10px] text-[#646465] truncate">
+    //                 {kb.knowledge_base_sources?.[0]?.filename || "No files"}
+    //               </p>
+    //             </div>
+    //           </div>
+
+    //           <div className="flex items-center justify-between text-[10px] text-[#646465]">
+    //             <div>Pages: {kb.knowledge_base_sources?.length || 0}</div>
+    //             <div className="flex gap-2">
+    //               {kb.knowledge_base_sources?.[0] && (
+    //                 kb.knowledge_base_sources[0].type === "url" ? (
+    //                   <a
+    //                     href={kb.knowledge_base_sources[0].url}
+    //                     target="_blank"
+    //                     rel="noopener noreferrer"
+    //                     className="p-1.5 text-[#646465] hover:text-gray-600 transition-colors"
+    //                   >
+    //                     <Link size={14} />
+    //                   </a>
+    //                 ) : (kb.knowledge_base_sources[0].type === "text" || kb.knowledge_base_sources[0].type === "document") && 
+    //                    (kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url) ? (
+    //                   <a
+    //                     href={kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url}
+    //                     target="_blank"
+    //                     rel="noopener noreferrer"
+    //                     className="p-1.5 text-[#646465] hover:text-gray-600 transition-colors"
+    //                   >
+    //                     <Download size={14} />
+    //                   </a>
+    //                 ) : null
+    //               )}
+    //               <button
+    //                 onClick={(e) => {
+    //                   e.stopPropagation();
+    //                   handleDelete(kb.knowledge_base_id);
+    //                 }}
+    //                 className="p-1.5 text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+    //                 disabled={actionLoading[`delete-${kb.knowledge_base_id}`]}
+    //               >
+    //                 <Trash2 size={14} className={actionLoading[`delete-${kb.knowledge_base_id}`] ? "animate-pulse" : ""} />
+    //               </button>
+    //             </div>
+    //           </div>
+
+              
+    //         </div>
+    //       ))}
+    //     </div>
+    //   )}
+     <div className="px-2 sm:px-4 py-4 max-w-screen-xl mx-auto">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-4 bg-white dark:bg-[#141414] dark:text-white">
         <div>
-          <h1 className="text-4xl font-medium mb-4">Knowledge base</h1>
-          <p className="text-xl font-medium">
-            Centralize all your company's knowledge in{" "}
-            <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">
-              one powerful database
-            </span>
-            . This ensures our AI bots are perfectly trained{" "}
-            <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">
-              to provide seamless support
-            </span>{" "}
-            and help your customers like never before!
+          <h1 className="text-2xl sm:text-4xl font-medium mb-2 sm:mb-4">Knowledge base</h1>
+          <p className="text-base sm:text-xl font-medium">
+            Centralize all your company's knowledge in{' '}
+            <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">one powerful database</span>. This ensures our AI bots are perfectly trained{' '}
+            <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">to provide seamless support</span> and help your customers like never before!
           </p>
         </div>
         <button
           onClick={() => setIsCreateDialogOpen(true)}
-          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm disabled:opacity-50 font-medium"
         >
           <Plus size={16} />
-          <span className="block w-max">Create database</span>
+          <span>Create database</span>
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 text-xs px-2 py-1.5 rounded-lg mb-6">
+        <div className="bg-red-50 text-red-600 text-sm px-2 py-1.5 rounded-lg mb-6">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-sm"> <RippleLoader/></div>
+        <div className="text-center py-12 text-sm">
+          <RippleLoader />
+        </div>
       ) : knowledgeBases.length === 0 ? (
         <div className="flex items-center justify-center h-[50vh]">
           <p className="text-gray-500 text-lg">No knowledge bases found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {knowledgeBases.map((kb) => (
             <div
               key={kb.knowledge_base_id}
-              className="bg-white rounded-[20px] p-6 pt-9 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-6 relative overflow-hidden"
+              className="bg-white dark:bg-[#1a1a1a] rounded-[20px] p-6 pt-9 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-6 relative overflow-hidden"
               style={{ pointerEvents: actionLoading[`delete-${kb.knowledge_base_id}`] ? 'none' : 'auto', opacity: actionLoading[`delete-${kb.knowledge_base_id}`] ? 0.5 : 1 }}
             >
               <div className="absolute top-0 right-0">
-                <div className={`pl-2 pr-4 py-0.25 rounded-sm text-[10px] font-medium ${
-                  kb.status === "complete" 
-                    ? "bg-green-100 text-green-700" 
-                    : "bg-yellow-100 text-yellow-700"
+                <div className={`pl-2 pr-4 py-0.5 rounded-sm text-[10px] font-medium ${
+                  kb.status === "complete" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                 }`}>
                   {kb.status === "complete" ? "Complete" : "In Progress"}
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  📄
-                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">📄</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-medium truncate mb-1">
-                    {kb.knowledge_base_name}
-                  </h3>
-                  <p className="text-[10px] text-[#646465] truncate">
-                    {kb.knowledge_base_sources?.[0]?.filename || "No files"}
-                  </p>
+                  <h3 className="text-xs font-medium truncate mb-1">{kb.knowledge_base_name}</h3>
+                  <p className="text-[10px] text-[#646465] truncate">{kb.knowledge_base_sources?.[0]?.filename || "No files"}</p>
                 </div>
               </div>
-
               <div className="flex items-center justify-between text-[10px] text-[#646465]">
                 <div>Pages: {kb.knowledge_base_sources?.length || 0}</div>
                 <div className="flex gap-2">
                   {kb.knowledge_base_sources?.[0] && (
                     kb.knowledge_base_sources[0].type === "url" ? (
-                      <a
-                        href={kb.knowledge_base_sources[0].url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 text-[#646465] hover:text-gray-600 transition-colors"
-                      >
+                      <a href={kb.knowledge_base_sources[0].url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[#646465] hover:text-gray-600">
                         <Link size={14} />
                       </a>
-                    ) : (kb.knowledge_base_sources[0].type === "text" || kb.knowledge_base_sources[0].type === "document") && 
-                       (kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url) ? (
-                      <a
-                        href={kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 text-[#646465] hover:text-gray-600 transition-colors"
-                      >
+                    ) : (kb.knowledge_base_sources[0].type === "text" || kb.knowledge_base_sources[0].type === "document") && (kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url) ? (
+                      <a href={kb.knowledge_base_sources[0].file_url || kb.knowledge_base_sources[0].content_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[#646465] hover:text-gray-600">
                         <Download size={14} />
                       </a>
                     ) : null
@@ -414,15 +501,13 @@ export function KnowledgeBase() {
                       e.stopPropagation();
                       handleDelete(kb.knowledge_base_id);
                     }}
-                    className="p-1.5 text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                    className="p-1.5 text-red-500 hover:text-red-600 disabled:opacity-50"
                     disabled={actionLoading[`delete-${kb.knowledge_base_id}`]}
                   >
                     <Trash2 size={14} className={actionLoading[`delete-${kb.knowledge_base_id}`] ? "animate-pulse" : ""} />
                   </button>
                 </div>
               </div>
-
-              
             </div>
           ))}
         </div>

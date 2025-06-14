@@ -154,8 +154,11 @@ export function Billing() {
 
   return (
     <div>
-      <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
-        <h1 className="text-4xl font-medium mb-4">Billing</h1>
+      {/* <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
+        <h1 className="text-4xl font-medium mb-4">Billing</h1> */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-[#141414] dark:border-white dark:text-white mb-10 gap-4">
+  <h1 className="text-3xl sm:text-4xl font-medium">Billing</h1>
+
         {hasPaymentMethod ? (
           <button className="bg-green-50 text-green-700 px-4 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium">
             <span>✓ Payment method added</span>
@@ -202,7 +205,7 @@ export function Billing() {
             {error || paymentMethodError}
           </div>
         )}
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid lg:grid-cols-3 sm:grid-cols-1 md:grid-cols-2 gap-5">
           {plans.map((plan, idx) => {
             const isSelected = selectedPlan === plan.productId;
             const isEven = idx % 2 === 0;
@@ -425,5 +428,6 @@ export function Billing() {
         </div>
       </div>
     </div>
+  
   );
 }

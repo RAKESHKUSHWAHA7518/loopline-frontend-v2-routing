@@ -282,47 +282,88 @@ export function PhoneNumbers() {
   };
 
   return (
-    <div>
-      <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
-        <h1 className="text-4xl font-medium">Phone numbers</h1>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsAddDropdownOpen(!isAddDropdownOpen)}
-            className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
-          >
-            <Plus size={16} />
-            <span>Add phone number</span>
-            <ChevronDown size={16} />
-          </button>
+    // <div>
+    //   <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
+    //     <h1 className="text-4xl font-medium">Phone numbers</h1>
+    //     <div className="relative" ref={dropdownRef}>
+    //       <button
+    //         onClick={() => setIsAddDropdownOpen(!isAddDropdownOpen)}
+    //         className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+    //       >
+    //         <Plus size={16} />
+    //         <span>Add phone number</span>
+    //         <ChevronDown size={16} />
+    //       </button>
           
-          {isAddDropdownOpen && (
-            <div className="absolute right-0 mt-1 w-56 bg-white  dark:bg-[#141414] dark:border-white dark:text-white rounded-lg shadow-lg border border-gray-200 z-10">
-              <div className="py-1">
-                <button
-                  onClick={() => {
-                    setIsAddDialogOpen(true);
-                    setIsAddDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
-                >
-                  <Plus size={14} />
-                  <span>Import Number</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setIsSipTrunkDialogOpen(true);
-                    setIsAddDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
-                >
-                  <Phone size={14} />
-                  <span>Import SIP Trunk Number</span>
-                </button>
-              </div>
+    //       {isAddDropdownOpen && (
+    //         <div className="absolute right-0 mt-1 w-56 bg-white  dark:bg-[#141414] dark:border-white dark:text-white rounded-lg shadow-lg border border-gray-200 z-10">
+    //           <div className="py-1">
+    //             <button
+    //               onClick={() => {
+    //                 setIsAddDialogOpen(true);
+    //                 setIsAddDropdownOpen(false);
+    //               }}
+    //               className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
+    //             >
+    //               <Plus size={14} />
+    //               <span>Import Number</span>
+    //             </button>
+    //             <button
+    //               onClick={() => {
+    //                 setIsSipTrunkDialogOpen(true);
+    //                 setIsAddDropdownOpen(false);
+    //               }}
+    //               className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
+    //             >
+    //               <Phone size={14} />
+    //               <span>Import SIP Trunk Number</span>
+    //             </button>
+    //           </div>
+    //         </div>
+    //       )}
+    //     </div>
+    //   </div>
+    <div className="px-2 sm:px-4 py-4 max-w-screen-xl mx-auto">
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10 bg-white dark:bg-[#141414] dark:border-white dark:text-white">
+      <h1 className="text-2xl sm:text-4xl font-medium">Phone numbers</h1>
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setIsAddDropdownOpen(!isAddDropdownOpen)}
+          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm disabled:opacity-50 font-medium"
+        >
+          <Plus size={16} />
+          <span>Add phone number</span>
+          <ChevronDown size={16} />
+        </button>
+
+        {isAddDropdownOpen && (
+          <div className="absolute right-0 mt-1 w-56 bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-lg shadow-lg border border-gray-200 z-10">
+            <div className="py-1">
+              <button
+                onClick={() => {
+                  setIsAddDialogOpen(true);
+                  setIsAddDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
+              >
+                <Plus size={14} />
+                <span>Import Number</span>
+              </button>
+              <button
+                onClick={() => {
+                  setIsSipTrunkDialogOpen(true);
+                  setIsAddDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#232222] flex items-center space-x-2"
+              >
+                <Phone size={14} />
+                <span>Import SIP Trunk Number</span>
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+    </div>
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">
