@@ -1,3 +1,1460 @@
+// import React, { useState, useEffect, useRef } from "react";
+// import { useAuth } from "../hooks/useAuth";
+// import { collection, query, orderBy, getDocs } from "firebase/firestore";
+// import { db } from "../lib/firebase";
+// import {
+//   Phone,
+//   Clock,
+//   AlertTriangle,
+//   X,
+//   Volume2,
+//   Copy,
+//   Download,
+//   Play,
+//   Pause,
+// } from "lucide-react";
+// import { formatDistanceToNow, format } from "date-fns";
+// import { motion } from "framer-motion";
+
+
+// interface CallData {
+//   call_id: string;
+//   agent_id: string;
+//   call_status: string;
+//   start_timestamp: number;
+//   end_timestamp: number;
+//   duration_ms: number;
+//   transcript: string;
+//   transcript_object: Array<{
+//     role: string;
+//     content: string;
+//     words: any[];
+//     metadata: any;
+//   }>;
+//   recording_url: string;
+//   disconnection_reason: string;
+//   call_type: string;
+//   call_analysis: {
+//     call_summary: string;
+//     user_sentiment: string;
+//     call_successful: boolean;
+//     agent_task_completion_rating: string;
+//   };
+// }
+
+// interface CallDetailsProps {
+//   call: CallData;
+//   onClose: () => void;
+// }
+
+// const getBadgeStyles = (type: string, sentiment: boolean = false) => {
+//   const baseStyles =
+//     "px-2 py-1 text-xs rounded-full inline-flex items-center justify-center font-medium";
+
+//   if (sentiment) {
+//     switch (type) {
+//       case "Positive":
+//         return `${baseStyles} bg-green-50 text-green-700`;
+//       case "Negative":
+//         return `${baseStyles} bg-red-50 text-red-700`;
+//       case "Neutral":
+//         return `${baseStyles} bg-gray-50 text-gray-700`;
+//       default:
+//         return `${baseStyles} bg-gray-50 text-gray-700`;
+//     }
+//   }
+
+//   switch (type) {
+//     case "Successful":
+//     case "true":
+//       return `${baseStyles} bg-green-50 text-green-700`;
+//     case "Unsuccessful":
+//     case "false":
+//       return `${baseStyles} bg-red-50 text-red-700`;
+//     case "User_Hangup":
+//     case "Agent_Hangup":
+//       return `${baseStyles} bg-blue-50 text-blue-700`;
+//     default:
+//       return `${baseStyles} bg-gray-50 text-gray-700`;
+//   }
+// };
+
+// function CallDetails({ call, onClose }: CallDetailsProps) {
+//   const audioRef = useRef<HTMLAudioElement | null>(null);
+//   const volumeTimeoutRef = useRef<NodeJS.Timeout>();
+//   const [audioProgress, setAudioProgress] = useState(0);
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [volume, setVolume] = useState(1);
+//   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
+//   const [isVolumeSliderHovered, setIsVolumeSliderHovered] = useState(false);
+
+//   const formatTimestamp = (timestamp: number) => {
+//     if (!timestamp) return "N/A";
+//     try {
+//       return format(new Date(timestamp), "MM/dd/yyyy HH:mm");
+//     } catch (error) {
+//       console.error("Error formatting timestamp:", error);
+//       return "Invalid date";
+//     }
+//   };
+
+//   const formatDuration = (ms: number) => {
+//     const seconds = typeof ms === "number" ? ms : 0;
+//     const minutes = Math.floor(ms / 60000);
+//     const secs = Math.floor(seconds % 60);
+//     return `${minutes}:${secs.toString().padStart(2, "0")}`;
+//   };
+
+//   const handleCopyCallId = () => {
+//     navigator.clipboard.writeText(call.call_id);
+//   };
+
+//   const handleCopyTranscript = () => {
+//     navigator.clipboard.writeText(call.transcript || "");
+//   };
+
+//   const handlePlayPause = () => {
+//     if (audioRef.current) {
+//       if (isPlaying) {
+//         audioRef.current.pause();
+//       } else {
+//         audioRef.current.play();
+//       }
+//       setIsPlaying(!isPlaying);
+//     }
+//   };
+
+//   const handleTimeUpdate = () => {
+//     if (audioRef.current) {
+//       const progress =
+//         (audioRef.current.currentTime / audioRef.current.duration) * 100;
+//       setAudioProgress(progress);
+//     }
+//   };
+
+//   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const newVolume = parseFloat(e.target.value);
+//     setVolume(newVolume);
+//     if (audioRef.current) {
+//       audioRef.current.volume = newVolume;
+//     }
+//   };
+
+//   const handleVolumeMouseEnter = () => {
+//     setIsVolumeHovered(true);
+//     if (volumeTimeoutRef.current) {
+//       clearTimeout(volumeTimeoutRef.current);
+//     }
+//   };
+
+//   const handleVolumeMouseLeave = () => {
+//     if (!isVolumeSliderHovered) {
+//       volumeTimeoutRef.current = setTimeout(() => {
+//         setIsVolumeHovered(false);
+//       }, 500);
+//     }
+//   };
+
+//   const handleSliderMouseEnter = () => {
+//     setIsVolumeSliderHovered(true);
+//     if (volumeTimeoutRef.current) {
+//       clearTimeout(volumeTimeoutRef.current);
+//     }
+//   };
+
+//   const handleSliderMouseLeave = () => {
+//     setIsVolumeSliderHovered(false);
+//     volumeTimeoutRef.current = setTimeout(() => {
+//       if (!isVolumeHovered) {
+//         setIsVolumeHovered(false);
+//       }
+//     }, 500);
+//   };
+
+//   const handleDownloadAudio = (e: React.MouseEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (call.recording_url) {
+//       // Create a temporary anchor element
+//       const link = document.createElement("a");
+//       link.href = call.recording_url;
+//       link.download = `call-${call.call_id}.wav`; // Suggested filename
+//       link.target = "_blank"; // Open in new tab if download fails
+//       link.rel = "noopener noreferrer";
+
+//       // Append to document, click, and remove
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const handleKeyDown = (e: KeyboardEvent) => {
+//       if (
+//         e.key === "ArrowUp" ||
+//         e.key === "ArrowDown" ||
+//         e.key === "ArrowLeft" ||
+//         e.key === "ArrowRight"
+//       ) {
+//         // Handle navigation
+//         console.log("Navigate with:", e.key);
+//       }
+//       if (e.key === "Escape") {
+//         onClose();
+//       }
+//     };
+
+//     window.addEventListener("keydown", handleKeyDown);
+//     return () => {
+//       window.removeEventListener("keydown", handleKeyDown);
+//       if (volumeTimeoutRef.current) {
+//         clearTimeout(volumeTimeoutRef.current);
+//       }
+//     };
+//   }, [onClose]);
+
+//   useEffect(() => {
+//     if (audioRef.current) {
+//       audioRef.current.volume = volume;
+//     }
+//   }, []);
+
+//   return (
+//     <div className="fixed inset-y-0 right-0 w-[440px] bg-white shadow-lg overflow-y-auto">
+//       <div className="p-3 flex items-center justify-between border-b">
+//         <div className="text-xs text-gray-500">
+//           Use <kbd className="px-1 py-0.5 bg-gray-100 rounded">↑</kbd>{" "}
+//           <kbd className="px-1 py-0.5 bg-gray-100 rounded">↓</kbd> to navigate
+//         </div>
+//         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+//           <X size={16} />
+//         </button>
+//       </div>
+
+//       <div className="p-4">
+//         {/* Call Header */}
+//         <div className="mb-4">
+//           <h2 className="text-base font-medium mb-1">
+//             {formatTimestamp(call.start_timestamp)}{" "}
+//             {call.call_type || "Unknown"}
+//           </h2>
+//           <div className="text-xs text-gray-500 space-y-1">
+//             <div className="flex items-center space-x-2">
+//               <span>Agent</span>
+//               <span className="text-gray-400">{call.agent_id}</span>
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <span>Call ID</span>
+//               <span className="text-gray-400">{call.call_id}</span>
+//               <button
+//                 onClick={handleCopyCallId}
+//                 className="text-gray-400 hover:text-gray-600"
+//               >
+//                 <Copy size={12} />
+//               </button>
+//             </div>
+//             <div>
+//               Duration: {formatTimestamp(call.start_timestamp)} -{" "}
+//               {formatTimestamp(call.end_timestamp)}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Audio Player */}
+//         {call.recording_url && (
+//           <div className="bg-gray-50 p-2 rounded mb-4">
+//             <audio
+//               ref={audioRef}
+//               src={call.recording_url}
+//               onTimeUpdate={handleTimeUpdate}
+//               onEnded={() => setIsPlaying(false)}
+//             />
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={handlePlayPause}
+//                 className="p-1 text-gray-600 hover:text-gray-800"
+//               >
+//                 {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+//               </button>
+//               <div className="flex-1 h-1 bg-gray-200 rounded-full">
+//                 <div
+//                   className="h-full bg-blue-600 rounded-full"
+//                   style={{ width: `${audioProgress}%` }}
+//                 />
+//               </div>
+//               <div
+//                 className="relative"
+//                 onMouseEnter={handleVolumeMouseEnter}
+//                 onMouseLeave={handleVolumeMouseLeave}
+//               >
+//                 <button className="p-1 text-gray-600 hover:text-gray-800">
+//                   <Volume2 size={16} />
+//                 </button>
+//                 {isVolumeHovered && (
+//                   <div
+//                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white p-2 rounded shadow-lg"
+//                     onMouseEnter={handleSliderMouseEnter}
+//                     onMouseLeave={handleSliderMouseLeave}
+//                   >
+//                     <input
+//                       type="range"
+//                       min="0"
+//                       max="1"
+//                       step="0.1"
+//                       value={volume}
+//                       onChange={handleVolumeChange}
+//                       className="w-24 h-1 bg-gray-200 rounded-full appearance-none cursor-pointer"
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               <button
+//                 onClick={handleDownloadAudio}
+//                 className="p-1 text-gray-600 hover:text-gray-800"
+//               >
+//                 <Download size={16} />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Conversation Analysis */}
+//         <div className="mb-4">
+//           <h3 className="text-xs font-medium mb-2">Conversation Analysis</h3>
+//           <div className="space-y-2">
+//             <div className="flex items-center justify-between">
+//               <span className="text-xs text-gray-600">Call Successful</span>
+//               <span className="px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">
+//                 {call.call_analysis.call_successful ? "Complete" : "Incomplete"}
+//               </span>
+//             </div>
+//             <div className="flex items-center justify-between">
+//               <span className="text-xs text-gray-600">User Sentiment</span>
+//               <span
+//                 className={`px-2 py-0.5 text-xs rounded-full ${
+//                   call.call_analysis.user_sentiment === "Positive"
+//                     ? "bg-green-50 text-green-700"
+//                     : call.call_analysis.user_sentiment === "Negative"
+//                       ? "bg-red-50 text-red-700"
+//                       : "bg-gray-50 text-gray-700"
+//                 }`}
+//               >
+//                 {call.call_analysis.user_sentiment}
+//               </span>
+//             </div>
+//             <div className="flex items-center justify-between">
+//               <span className="text-xs text-gray-600">
+//                 Disconnection Reason
+//               </span>
+//               <span className="px-2 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700">
+//                 {call.disconnection_reason?.replace(/_/g, " ") || "Unknown"}
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Summary */}
+//         <div className="mb-4">
+//           <h3 className="text-xs font-medium mb-2">Summary</h3>
+//           <p className="text-xs text-gray-600">
+//             {call.call_analysis.call_summary}
+//           </p>
+//         </div>
+
+//         {/* Transcript */}
+//         <div>
+//           <h3 className="text-xs font-medium mb-2 flex items-center justify-between">
+//             Transcription
+//             <button
+//               onClick={handleCopyTranscript}
+//               className="text-gray-400 hover:text-gray-600"
+//             >
+//               <Copy size={14} />
+//             </button>
+//           </h3>
+//           <div className="space-y-3">
+//             {call.transcript_object.map((entry, index) => (
+//               <div key={index} className="flex items-start">
+//                 <div className="w-12 flex-shrink-0">
+//                   <div className="text-xs font-medium text-gray-500 capitalize">
+//                     {entry.role}:
+//                   </div>
+//                 </div>
+//                 <div className="flex-1 min-w-0">
+//                   <p className="text-xs text-gray-800">{entry.content}</p>
+//                   {entry.metadata?.tool_calls && (
+//                     <div className="mt-1 text-xs text-blue-600">
+//                       &gt; Tool Invocation: {entry.metadata.tool_calls[0]?.name}
+//                     </div>
+//                   )}
+//                 </div>
+//                 <div className="w-8 flex-shrink-0 text-right">
+//                   <span className="text-xs text-gray-400">
+//                     {formatDuration(entry.words?.[0]?.start * 1000 || 0)}
+//                   </span>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export function CallHistory() {
+//   const { user } = useAuth();
+//   const [calls, setCalls] = useState<CallData[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [selectedCall, setSelectedCall] = useState<CallData | null>(null);
+//   const [stats, setStats] = useState({
+//     totalCalls: 0,
+//     avgDuration: 0,
+//     negativeSentimentRatio: 0,
+//   });
+
+//   useEffect(() => {
+//     const fetchCalls = async () => {
+//       if (!user) return;
+
+//       try {
+//         const callsRef = collection(
+//           db,
+//           "users",
+//           user.uid,
+//           "workspaces",
+//           "1",
+//           "call_history",
+//         );
+//         const q = query(callsRef, orderBy("start_timestamp", "desc"));
+//         const querySnapshot = await getDocs(q);
+
+//         const callsData = querySnapshot.docs.map((doc) => ({
+//           ...doc.data(),
+//           call_id: doc.id,
+//         })) as CallData[];
+
+//         setCalls(callsData);
+
+//         // Calculate stats
+//         const total = callsData.length;
+//         const avgDuration =
+//           total > 0
+//             ? callsData.reduce(
+//                 (acc, call) => acc + (call.duration_ms || 0),
+//                 0,
+//               ) / total
+//             : 0;
+//         const negativeCalls = callsData.filter(
+//           (call) => call.call_analysis?.user_sentiment === "Negative",
+//         ).length;
+//         const negativeRatio = total > 0 ? (negativeCalls / total) * 100 : 0;
+
+//         setStats({
+//           totalCalls: total,
+//           avgDuration: avgDuration,
+//           negativeSentimentRatio: negativeRatio,
+//         });
+
+//         setLoading(false);
+//       } catch (error) {
+//         console.error("Error fetching calls:", error);
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchCalls();
+//   }, [user]);
+
+//   const formatDuration = (ms: number) => {
+//     const minutes = Math.floor(ms / 60000);
+//     const seconds = Math.floor((ms % 60000) / 1000);
+//     return `${minutes}m${seconds}s`;
+//   };
+
+
+//   // components/ShimmerCard.tsx
+//   const ShimmerCard = () => (
+//   <div className="animate-pulse bg-white dark:bg-gray-400 rounded-[20px] p-4 shadow-sm border border-[#1012141A]">
+//     <div className="flex items-center gap-x-2 mb-4">
+//       <div className="w-10 h-10 bg-gray-200 rounded-full" />
+//       <div className="flex-1 h-4 bg-gray-200 rounded" />
+//     </div>
+//     <div className="h-10 w-3/4 ml-12 bg-gray-200 rounded" />
+//   </div>
+// );
+
+//   const ShimmerRow = () => (
+//   <tr className="animate-pulse">
+//     {[...Array(5)].map((_, i) => (
+//       <td key={i} className="px-6 py-4">
+//         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+//       </td>
+//     ))}
+//   </tr>
+// );
+
+
+//  if (loading) {
+//     return     <>
+//     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+//       <ShimmerCard />
+//       <ShimmerCard />
+//       <ShimmerCard />
+//     </div>
+//     <div className="bg-white dark:bg-slate-200 rounded-lg shadow-sm overflow-hidden">
+//       <div className="overflow-x-auto">
+//         <table className="min-w-full divide-y divide-gray-200">
+//           <thead className="bg-gray-50 dark:bg-[#252525]">
+//             <tr>
+//               {["Time", "Call Duration", "User Sentiment", "Call Successful", "Disconnection Reason"].map((head) => (
+//                 <th key={head} className="px-6 py-3 text-left text-xs font-medium text-gray-500  dark:text-white uppercase tracking-wider">{head}</th>
+//               ))}
+//             </tr>
+//           </thead>
+//           <tbody className="bg-white divide-y dark:bg-gray-400 divide-gray-200">
+//             {[...Array(6)].map((_, idx) => (
+//               <ShimmerRow key={idx} />
+//             ))}
+//           </tbody>
+//         </table>
+//       </div>
+//     </div>
+//   </> 
+//   }
+
+//   return (
+//     <div>
+//       <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
+//         <h1 className="text-4xl font-medium">Call History</h1>
+//         {/* date and time details will be here */}
+//       </div>
+
+//       {/* Stats Cards */}
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+//         {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
+//      <motion.div
+//   initial={{ opacity: 0, y: 20 }}
+//   animate={{ opacity: 1, y: 0 }}
+//   transition={{ duration: 0.4 }}
+//   className="bg-white  dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
+// >
+//           <div className="flex items-center gap-x-2">
+//             <div className="flex items-center gap-x-2">
+//               <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
+//                 <Phone className="text-gray-400" size={18} />
+//               </div>
+//               <span className="text-md font-medium">Total Calls</span>
+//             </div>
+//             {true && (
+//               <span
+//                 className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
+//               >
+//                 {"5.6%"}
+//               </span>
+//             )}
+//           </div>
+//           <div className="text-5xl font-medium ml-12">{stats.totalCalls}</div>
+//         {/* </div> */}
+//         </motion.div>
+       
+//         {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
+// <motion.div
+//   initial={{ opacity: 0, y: 20 }}
+//   animate={{ opacity: 1, y: 0 }}
+//   transition={{ duration: 0.4 }}
+//   className="  bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
+// >
+//           <div className="flex items-center gap-x-2">
+//             <div className="flex items-center gap-x-2">
+//               <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
+//                 <Clock className="text-gray-400" size={18} />
+//               </div>
+//               <span className="text-md font-medium">Avg Call Duration</span>
+//             </div>
+//             {true && (
+//               <span
+//                 className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
+//               >
+//                 {"5.6%"}
+//               </span>
+//             )}
+//           </div>
+//           <div className="text-5xl font-medium ml-12">
+//             {formatDuration(stats.avgDuration)}
+//           </div>
+//           </motion.div>
+//         {/* </div> */}
+
+//         {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
+//        <motion.div
+//   initial={{ opacity: 0, y: 20 }}
+//   animate={{ opacity: 1, y: 0 }}
+//   transition={{ duration: 0.4 }}
+//   className="  bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
+// > 
+//           <div className="flex items-center gap-x-2">
+//             <div className="flex items-center gap-x-2">
+//               <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
+//                 <Clock className="text-gray-400" size={18} />
+//               </div>
+//               <span className="text-md font-medium">Negative Sentiment Ratio</span>
+//             </div>
+//             {true && (
+//               <span
+//                 className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
+//               >
+//                 {'5.6%'}
+//               </span>
+//             )}
+//           </div>
+//           <div className="text-5xl font-medium ml-12">{stats.negativeSentimentRatio.toFixed(2)}%</div>
+//           </motion.div>
+//         {/* </div> */}
+        
+//       </div>
+
+//       {/* Calls Table */}
+//       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="min-w-full divide-y divide-gray-200">
+//             <thead className="bg-gray-50 dark:bg-[#252525] ">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+//                   Time
+//                 </th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+//                   Call Duration
+//                 </th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+//                   User Sentiment
+//                 </th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+//                   Call Successful
+//                 </th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+//                   Disconnection Reason
+//                 </th>
+//               </tr>
+//             </thead>
+//             <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200">
+//               {calls.map((call) => (
+//                 <tr
+//                   key={call.call_id}
+//                   onClick={() => setSelectedCall(call)}
+//                   className="hover:bg-gray-50 cursor-pointer"
+//                 >
+//                   <td className="px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+//                     {call.start_timestamp
+//                       ? formatDistanceToNow(new Date(call.start_timestamp), {
+//                           addSuffix: true,
+//                         })
+//                       : "N/A"}
+//                   </td>
+//                   <td className="px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+//                     {formatDuration(call.duration_ms)}
+//                   </td>
+//                   <td className="px-6 py-4 whitespace-nowrap">
+//                     <span
+//                       className={getBadgeStyles(
+//                         call.call_analysis?.user_sentiment,
+//                         true,
+//                       )}
+//                     >
+//                       {call.call_analysis?.user_sentiment || "Unknown"}
+//                     </span>
+//                   </td>
+//                   <td className="px-6 py-4 whitespace-nowrap">
+//                     <span
+//                       className={getBadgeStyles(
+//                         call.call_analysis?.call_successful
+//                           ? "Successful"
+//                           : "Unsuccessful",
+//                       )}
+//                     >
+//                       {call.call_analysis?.call_successful
+//                         ? "Successful"
+//                         : "Unsuccessful"}
+//                     </span>
+//                   </td>
+//                   <td className="px-6 py-4 whitespace-nowrap">
+//                     <span className={getBadgeStyles(call.disconnection_reason)}>
+//                       {call.disconnection_reason?.replace(/_/g, " ") ||
+//                         "Unknown"}
+//                     </span>
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+
+//       {/* Call Details Sidebar */}
+//       {selectedCall && (
+//         <CallDetails
+//           call={selectedCall}
+//           onClose={() => setSelectedCall(null)}
+//         />
+//       )}
+//     </div>
+//   );
+// }
+
+
+
+// import React, { useState, useEffect, useRef } from "react";
+// import { useAuth } from "../hooks/useAuth";
+// import { collection, query, orderBy, getDocs } from "firebase/firestore";
+// import { db } from "../lib/firebase";
+// import {
+//   Phone,
+//   Clock,
+//   AlertTriangle,
+//   X,
+//   Volume2,
+//   Copy,
+//   Download,
+//   Play,
+//   Pause,
+// } from "lucide-react";
+// import { formatDistanceToNow, format } from "date-fns";
+// import { motion } from "framer-motion";
+
+// interface CallData {
+//   call_id: string;
+//   agent_id: string;
+//   call_status: string;
+//   start_timestamp: number;
+//   end_timestamp: number;
+//   duration_ms: number;
+//   transcript: string;
+//   transcript_object: Array<{
+//     role: string;
+//     content: string;
+//     words: any[];
+//     metadata: any;
+//   }>;
+//   recording_url: string;
+//   disconnection_reason: string;
+//   call_type: string;
+//   call_analysis: {
+//     call_summary: string;
+//     user_sentiment: string;
+//     call_successful: boolean;
+//     agent_task_completion_rating: string;
+//   };
+// }
+
+// interface CallDetailsProps {
+//   call: CallData;
+//   onClose: () => void;
+// }
+
+// const getBadgeStyles = (type: string, sentiment: boolean = false) => {
+//   const baseStyles =
+//     "px-2 py-1 text-xs rounded-full inline-flex items-center justify-center font-medium";
+
+//   if (sentiment) {
+//     switch (type) {
+//       case "Positive":
+//         return `${baseStyles} bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400`;
+//       case "Negative":
+//         return `${baseStyles} bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400`;
+//       case "Neutral":
+//         return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
+//       default:
+//         return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
+//     }
+//   }
+
+//   switch (type) {
+//     case "Successful":
+//     case "true":
+//       return `${baseStyles} bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400`;
+//     case "Unsuccessful":
+//     case "false":
+//       return `${baseStyles} bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400`;
+//     case "User_Hangup":
+//     case "Agent_Hangup":
+//       return `${baseStyles} bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400`;
+//     default:
+//       return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
+//   }
+// };
+
+// function CallDetails({ call, onClose }: CallDetailsProps) {
+//   const audioRef = useRef<HTMLAudioElement | null>(null);
+//   const volumeTimeoutRef = useRef<NodeJS.Timeout>();
+//   const [audioProgress, setAudioProgress] = useState(0);
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [volume, setVolume] = useState(1);
+//   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
+//   const [isVolumeSliderHovered, setIsVolumeSliderHovered] = useState(false);
+
+//   const formatTimestamp = (timestamp: number) => {
+//     if (!timestamp) return "N/A";
+//     try {
+//       return format(new Date(timestamp), "MM/dd/yyyy HH:mm");
+//     } catch (error) {
+//       console.error("Error formatting timestamp:", error);
+//       return "Invalid date";
+//     }
+//   };
+
+//   const formatDuration = (ms: number) => {
+//     const seconds = typeof ms === "number" ? ms : 0;
+//     const minutes = Math.floor(ms / 60000);
+//     const secs = Math.floor(seconds % 60);
+//     return `${minutes}:${secs.toString().padStart(2, "0")}`;
+//   };
+
+//   const handleCopyCallId = () => {
+//     navigator.clipboard.writeText(call.call_id);
+//   };
+
+//   const handleCopyTranscript = () => {
+//     navigator.clipboard.writeText(call.transcript || "");
+//   };
+
+//   const handlePlayPause = () => {
+//     if (audioRef.current) {
+//       if (isPlaying) {
+//         audioRef.current.pause();
+//       } else {
+//         audioRef.current.play();
+//       }
+//       setIsPlaying(!isPlaying);
+//     }
+//   };
+
+//   const handleTimeUpdate = () => {
+//     if (audioRef.current) {
+//       const progress =
+//         (audioRef.current.currentTime / audioRef.current.duration) * 100;
+//       setAudioProgress(progress);
+//     }
+//   };
+
+//   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const newVolume = parseFloat(e.target.value);
+//     setVolume(newVolume);
+//     if (audioRef.current) {
+//       audioRef.current.volume = newVolume;
+//     }
+//   };
+
+//   const handleVolumeMouseEnter = () => {
+//     setIsVolumeHovered(true);
+//     if (volumeTimeoutRef.current) {
+//       clearTimeout(volumeTimeoutRef.current);
+//     }
+//   };
+
+//   const handleVolumeMouseLeave = () => {
+//     if (!isVolumeSliderHovered) {
+//       volumeTimeoutRef.current = setTimeout(() => {
+//         setIsVolumeHovered(false);
+//       }, 500);
+//     }
+//   };
+
+//   const handleSliderMouseEnter = () => {
+//     setIsVolumeSliderHovered(true);
+//     if (volumeTimeoutRef.current) {
+//       clearTimeout(volumeTimeoutRef.current);
+//     }
+//   };
+
+//   const handleSliderMouseLeave = () => {
+//     setIsVolumeSliderHovered(false);
+//     volumeTimeoutRef.current = setTimeout(() => {
+//       if (!isVolumeHovered) {
+//         setIsVolumeHovered(false);
+//       }
+//     }, 500);
+//   };
+
+//   const handleDownloadAudio = (e: React.MouseEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (call.recording_url) {
+//       const link = document.createElement("a");
+//       link.href = call.recording_url;
+//       link.download = `call-${call.call_id}.wav`;
+//       link.target = "_blank";
+//       link.rel = "noopener noreferrer";
+
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const handleKeyDown = (e: KeyboardEvent) => {
+//       if (
+//         e.key === "ArrowUp" ||
+//         e.key === "ArrowDown" ||
+//         e.key === "ArrowLeft" ||
+//         e.key === "ArrowRight"
+//       ) {
+//         console.log("Navigate with:", e.key);
+//       }
+//       if (e.key === "Escape") {
+//         onClose();
+//       }
+//     };
+
+//     window.addEventListener("keydown", handleKeyDown);
+//     return () => {
+//       window.removeEventListener("keydown", handleKeyDown);
+//       if (volumeTimeoutRef.current) {
+//         clearTimeout(volumeTimeoutRef.current);
+//       }
+//     };
+//   }, [onClose]);
+
+//   useEffect(() => {
+//     if (audioRef.current) {
+//       audioRef.current.volume = volume;
+//     }
+//   }, []);
+
+//   return (
+//     <div className="fixed inset-0 lg:inset-y-0 lg:right-0 lg:w-[440px] w-full bg-white dark:bg-[#141414] shadow-lg overflow-y-auto z-50">
+//       <div className="p-3 sm:p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+//         <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+//           <span className="hidden sm:inline">
+//             Use <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">↑</kbd>{" "}
+//             <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">↓</kbd> to navigate
+//           </span>
+//           <span className="sm:hidden">Call Details</span>
+//         </div>
+//         <button 
+//           onClick={onClose} 
+//           className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
+//         >
+//           <X size={20} className="sm:w-4 sm:h-4" />
+//         </button>
+//       </div>
+
+//       <div className="p-4 sm:p-6">
+//         {/* Call Header */}
+//         <div className="mb-4 sm:mb-6">
+//           <h2 className="text-lg sm:text-base font-medium mb-2 sm:mb-1 dark:text-white">
+//             {formatTimestamp(call.start_timestamp)}{" "}
+//             {call.call_type || "Unknown"}
+//           </h2>
+//           <div className="text-sm sm:text-xs text-gray-500 dark:text-gray-400 space-y-2 sm:space-y-1">
+//             <div className="flex items-center space-x-2">
+//               <span>Agent</span>
+//               <span className="text-gray-400 dark:text-gray-500 truncate">{call.agent_id}</span>
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <span>Call ID</span>
+//               <span className="text-gray-400 dark:text-gray-500 truncate flex-1">{call.call_id}</span>
+//               <button
+//                 onClick={handleCopyCallId}
+//                 className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
+//               >
+//                 <Copy size={14} className="sm:w-3 sm:h-3" />
+//               </button>
+//             </div>
+//             <div className="text-sm sm:text-xs">
+//               Duration: {formatTimestamp(call.start_timestamp)} -{" "}
+//               {formatTimestamp(call.end_timestamp)}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Audio Player */}
+//         {call.recording_url && (
+//           <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-2 rounded mb-4 sm:mb-6">
+//             <audio
+//               ref={audioRef}
+//               src={call.recording_url}
+//               onTimeUpdate={handleTimeUpdate}
+//               onEnded={() => setIsPlaying(false)}
+//             />
+//             <div className="flex items-center space-x-3 sm:space-x-2">
+//               <button
+//                 onClick={handlePlayPause}
+//                 className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
+//               >
+//                 {isPlaying ? <Pause size={20} className="sm:w-4 sm:h-4" /> : <Play size={20} className="sm:w-4 sm:h-4" />}
+//               </button>
+//               <div className="flex-1 h-2 sm:h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+//                 <div
+//                   className="h-full bg-blue-600 rounded-full"
+//                   style={{ width: `${audioProgress}%` }}
+//                 />
+//               </div>
+//               <div
+//                 className="relative"
+//                 onMouseEnter={handleVolumeMouseEnter}
+//                 onMouseLeave={handleVolumeMouseLeave}
+//               >
+//                 <button className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">
+//                   <Volume2 size={20} className="sm:w-4 sm:h-4" />
+//                 </button>
+//                 {isVolumeHovered && (
+//                   <div
+//                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-gray-800 p-2 rounded shadow-lg border dark:border-gray-700"
+//                     onMouseEnter={handleSliderMouseEnter}
+//                     onMouseLeave={handleSliderMouseLeave}
+//                   >
+//                     <input
+//                       type="range"
+//                       min="0"
+//                       max="1"
+//                       step="0.1"
+//                       value={volume}
+//                       onChange={handleVolumeChange}
+//                       className="w-24 h-1 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer"
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               <button
+//                 onClick={handleDownloadAudio}
+//                 className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
+//               >
+//                 <Download size={20} className="sm:w-4 sm:h-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Conversation Analysis */}
+//         <div className="mb-4 sm:mb-6">
+//           <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 dark:text-white">Conversation Analysis</h3>
+//           <div className="space-y-3 sm:space-y-2">
+//             <div className="flex items-center justify-between">
+//               <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">Call Successful</span>
+//               <span className="px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+//                 {call.call_analysis.call_successful ? "Complete" : "Incomplete"}
+//               </span>
+//             </div>
+//             <div className="flex items-center justify-between">
+//               <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">User Sentiment</span>
+//               <span
+//                 className={`px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full ${
+//                   call.call_analysis.user_sentiment === "Positive"
+//                     ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+//                     : call.call_analysis.user_sentiment === "Negative"
+//                       ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+//                       : "bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"
+//                 }`}
+//               >
+//                 {call.call_analysis.user_sentiment}
+//               </span>
+//             </div>
+//             <div className="flex items-center justify-between">
+//               <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">
+//                 Disconnection Reason
+//               </span>
+//               <span className="px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+//                 {call.disconnection_reason?.replace(/_/g, " ") || "Unknown"}
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Summary */}
+//         <div className="mb-4 sm:mb-6">
+//           <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 dark:text-white">Summary</h3>
+//           <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+//             {call.call_analysis.call_summary}
+//           </p>
+//         </div>
+
+//         {/* Transcript */}
+//         <div>
+//           <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 flex items-center justify-between dark:text-white">
+//             Transcription
+//             <button
+//               onClick={handleCopyTranscript}
+//               className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
+//             >
+//               <Copy size={16} className="sm:w-3.5 sm:h-3.5" />
+//             </button>
+//           </h3>
+//           <div className="space-y-4 sm:space-y-3">
+//             {call.transcript_object.map((entry, index) => (
+//               <div key={index} className="flex items-start space-x-3 sm:space-x-0">
+//                 <div className="w-16 sm:w-12 flex-shrink-0">
+//                   <div className="text-sm sm:text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
+//                     {entry.role}:
+//                   </div>
+//                 </div>
+//                 <div className="flex-1 min-w-0 sm:ml-3">
+//                   <p className="text-sm sm:text-xs text-gray-800 dark:text-gray-200 leading-relaxed">{entry.content}</p>
+//                   {entry.metadata?.tool_calls && (
+//                     <div className="mt-1 text-sm sm:text-xs text-blue-600 dark:text-blue-400">
+//                       &gt; Tool Invocation: {entry.metadata.tool_calls[0]?.name}
+//                     </div>
+//                   )}
+//                 </div>
+//                 <div className="w-12 sm:w-8 flex-shrink-0 text-right">
+//                   <span className="text-sm sm:text-xs text-gray-400 dark:text-gray-500">
+//                     {formatDuration(entry.words?.[0]?.start * 1000 || 0)}
+//                   </span>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export function CallHistory() {
+//   const { user } = useAuth();
+//   const [calls, setCalls] = useState<CallData[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [selectedCall, setSelectedCall] = useState<CallData | null>(null);
+//   const [stats, setStats] = useState({
+//     totalCalls: 0,
+//     avgDuration: 0,
+//     negativeSentimentRatio: 0,
+//   });
+
+//   useEffect(() => {
+//     const fetchCalls = async () => {
+//       if (!user) return;
+
+//       try {
+//         const callsRef = collection(
+//           db,
+//           "users",
+//           user.uid,
+//           "workspaces",
+//           "1",
+//           "call_history",
+//         );
+//         const q = query(callsRef, orderBy("start_timestamp", "desc"));
+//         const querySnapshot = await getDocs(q);
+
+//         const callsData = querySnapshot.docs.map((doc) => ({
+//           ...doc.data(),
+//           call_id: doc.id,
+//         })) as CallData[];
+
+//         setCalls(callsData);
+
+//         const total = callsData.length;
+//         const avgDuration =
+//           total > 0
+//             ? callsData.reduce(
+//                 (acc, call) => acc + (call.duration_ms || 0),
+//                 0,
+//               ) / total
+//             : 0;
+//         const negativeCalls = callsData.filter(
+//           (call) => call.call_analysis?.user_sentiment === "Negative",
+//         ).length;
+//         const negativeRatio = total > 0 ? (negativeCalls / total) * 100 : 0;
+
+//         setStats({
+//           totalCalls: total,
+//           avgDuration: avgDuration,
+//           negativeSentimentRatio: negativeRatio,
+//         });
+
+//         setLoading(false);
+//       } catch (error) {
+//         console.error("Error fetching calls:", error);
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchCalls();
+//   }, [user]);
+
+//   const formatDuration = (ms: number) => {
+//     const minutes = Math.floor(ms / 60000);
+//     const seconds = Math.floor((ms % 60000) / 1000);
+//     return `${minutes}m${seconds}s`;
+//   };
+
+//   const ShimmerCard = () => (
+//     <div className="animate-pulse bg-white dark:bg-gray-800 rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A] dark:border-gray-700">
+//       <div className="flex items-center gap-x-2 sm:gap-x-3 mb-4">
+//         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded-full" />
+//         <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+//       </div>
+//       <div className="h-8 sm:h-10 w-3/4 ml-10 sm:ml-12 bg-gray-200 dark:bg-gray-700 rounded" />
+//     </div>
+//   );
+
+//   const ShimmerRow = () => (
+//     <tr className="animate-pulse">
+//       {[...Array(5)].map((_, i) => (
+//         <td key={i} className="px-3 sm:px-6 py-4">
+//           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+//         </td>
+//       ))}
+//     </tr>
+//   );
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+//         <div className="max-w-7xl mx-auto">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+//             <ShimmerCard />
+//             <ShimmerCard />
+//             <ShimmerCard />
+//           </div>
+//           <div className="bg-white dark:bg-[#141414] rounded-lg shadow-sm overflow-hidden border dark:border-gray-700">
+//             <div className="overflow-x-auto">
+//               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+//                 <thead className="bg-gray-50 dark:bg-[#252525]">
+//                   <tr>
+//                     {["Time", "Call Duration", "User Sentiment", "Call Successful", "Disconnection Reason"].map((head) => (
+//                       <th key={head} className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                         {head}
+//                       </th>
+//                     ))}
+//                   </tr>
+//                 </thead>
+//                 <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200 dark:divide-gray-700">
+//                   {[...Array(6)].map((_, idx) => (
+//                     <ShimmerRow key={idx} />
+//                   ))}
+//                 </tbody>
+//               </table>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+//       <div className="max-w-7xl mx-auto">
+//         {/* Header */}
+//         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white mb-6 sm:mb-8 lg:mb-10 gap-4 p-4 sm:p-6 rounded-lg shadow-sm border">
+//           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium">Call History</h1>
+//         </div>
+
+//         {/* Stats Cards */}
+//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+//           <motion.div
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.4 }}
+//             className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A]"
+//           >
+//             <div className="flex items-center gap-x-2 sm:gap-x-3">
+//               <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+//                 <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+//                   <Phone className="text-gray-400 dark:text-gray-500" size={16} />
+//                 </div>
+//                 <span className="text-sm sm:text-base font-medium">Total Calls</span>
+//               </div>
+//               <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+//                 5.6%
+//               </span>
+//             </div>
+//             <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
+//               {stats.totalCalls}
+//             </div>
+//           </motion.div>
+
+//           <motion.div
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.4, delay: 0.1 }}
+//             className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A]"
+//           >
+//             <div className="flex items-center gap-x-2 sm:gap-x-3">
+//               <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+//                 <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+//                   <Clock className="text-gray-400 dark:text-gray-500" size={16} />
+//                 </div>
+//                 <span className="text-sm sm:text-base font-medium">Avg Call Duration</span>
+//               </div>
+//               <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+//                 5.6%
+//               </span>
+//             </div>
+//             <div className="text-2xl sm:text-3xl lg:text-4xl font-medium ml-10 sm:ml-12 mt-2">
+//               {formatDuration(stats.avgDuration)}
+//             </div>
+//           </motion.div>
+
+//           <motion.div
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.4, delay: 0.2 }}
+//             className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A] sm:col-span-2 lg:col-span-1"
+//           >
+//             <div className="flex items-center gap-x-2 sm:gap-x-3">
+//               <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+//                 <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+//                   <AlertTriangle className="text-gray-400 dark:text-gray-500" size={16} />
+//                 </div>
+//                 <span className="text-sm sm:text-base font-medium">Negative Sentiment Ratio</span>
+//               </div>
+//               <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+//                 5.6%
+//               </span>
+//             </div>
+//             <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
+//               {stats.negativeSentimentRatio.toFixed(2)}%
+//             </div>
+//           </motion.div>
+//         </div>
+
+//         {/* Mobile Call Cards */}
+//         <div className="block sm:hidden space-y-4 mb-6">
+//           {calls.map((call) => (
+//             <motion.div
+//               key={call.call_id}
+//               initial={{ opacity: 0, y: 10 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               whileTap={{ scale: 0.98 }}
+//               onClick={() => setSelectedCall(call)}
+//               className="bg-white dark:bg-[#141414] rounded-lg p-4 shadow-sm border dark:border-gray-700 cursor-pointer"
+//             >
+//               <div className="flex justify-between items-start mb-3">
+//                 <div className="flex-1">
+//                   <p className="text-sm font-medium dark:text-white">
+//                     {call.start_timestamp
+//                       ? formatDistanceToNow(new Date(call.start_timestamp), {
+//                           addSuffix: true,
+//                         })
+//                       : "N/A"}
+//                   </p>
+//                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+//                     Duration: {formatDuration(call.duration_ms)}
+//                   </p>
+//                 </div>
+//                 <span
+//                   className={getBadgeStyles(
+//                     call.call_analysis?.user_sentiment,
+//                     true,
+//                   )}
+//                 >
+//                   {call.call_analysis?.user_sentiment || "Unknown"}
+//                 </span>
+//               </div>
+//               <div className="flex justify-between items-center">
+//                 <span
+//                   className={getBadgeStyles(
+//                     call.call_analysis?.call_successful
+//                       ? "Successful"
+//                       : "Unsuccessful",
+//                   )}
+//                 >
+//                   {call.call_analysis?.call_successful
+//                     ? "Successful"
+//                     : "Unsuccessful"}
+//                 </span>
+//                 <span className={getBadgeStyles(call.disconnection_reason)}>
+//                   {call.disconnection_reason?.replace(/_/g, " ") || "Unknown"}
+//                 </span>
+//               </div>
+//             </motion.div>
+//           ))}
+//         </div>
+
+//         {/* Desktop/Tablet Table */}
+//         <div className="hidden sm:block bg-white dark:bg-[#141414] rounded-lg shadow-sm overflow-hidden border dark:border-gray-700">
+//           <div className="overflow-x-auto">
+//             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+//               <thead className="bg-gray-50 dark:bg-[#252525]">
+//                 <tr>
+//                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                     Time
+//                   </th>
+//                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                     Call Duration
+//                   </th>
+//                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                     User Sentiment
+//                   </th>
+//                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                     Call Successful
+//                   </th>
+//                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                     Disconnection Reason
+//                   </th>
+//                 </tr>
+//               </thead>
+//               <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200 dark:divide-gray-700">
+//                 {calls.map((call) => (
+//                   <tr
+//                     key={call.call_id}
+//                     onClick={() => setSelectedCall(call)}
+//                     className="hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+//                   >
+//                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+//                       {call.start_timestamp
+//                         ? formatDistanceToNow(new Date(call.start_timestamp), {
+//                             addSuffix: true,
+//                           })
+//                         : "N/A"}
+//                     </td>
+//                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+//                       {formatDuration(call.duration_ms)}
+//                     </td>
+//                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+//                       <span
+//                         className={getBadgeStyles(
+//                           call.call_analysis?.user_sentiment,
+//                           true,
+//                         )}
+//                       >
+//                         {call.call_analysis?.user_sentiment || "Unknown"}
+//                       </span>
+//                     </td>
+//                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+//                       <span
+//                         className={getBadgeStyles(
+//                           call.call_analysis?.call_successful
+//                             ? "Successful"
+//                             : "Unsuccessful",
+//                         )}
+//                       >
+//                         {call.call_analysis?.call_successful
+//                           ? "Successful"
+//                           : "Unsuccessful"}
+//                       </span>
+//                     </td>
+//                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+//                       <span className={getBadgeStyles(call.disconnection_reason)}>
+//                         {call.disconnection_reason?.replace(/_/g, " ") ||
+//                           "Unknown"}
+//                       </span>
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </div>
+
+//         {/* Call Details Sidebar */}
+//         {selectedCall && (
+//           <CallDetails
+//             call={selectedCall}
+//             onClose={() => setSelectedCall(null)}
+//           />
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
@@ -15,7 +1472,6 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { motion } from "framer-motion";
-
 
 interface CallData {
   call_id: string;
@@ -54,28 +1510,28 @@ const getBadgeStyles = (type: string, sentiment: boolean = false) => {
   if (sentiment) {
     switch (type) {
       case "Positive":
-        return `${baseStyles} bg-green-50 text-green-700`;
+        return `${baseStyles} bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400`;
       case "Negative":
-        return `${baseStyles} bg-red-50 text-red-700`;
+        return `${baseStyles} bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400`;
       case "Neutral":
-        return `${baseStyles} bg-gray-50 text-gray-700`;
+        return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
       default:
-        return `${baseStyles} bg-gray-50 text-gray-700`;
+        return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
     }
   }
 
   switch (type) {
     case "Successful":
     case "true":
-      return `${baseStyles} bg-green-50 text-green-700`;
+      return `${baseStyles} bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400`;
     case "Unsuccessful":
     case "false":
-      return `${baseStyles} bg-red-50 text-red-700`;
+      return `${baseStyles} bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400`;
     case "User_Hangup":
     case "Agent_Hangup":
-      return `${baseStyles} bg-blue-50 text-blue-700`;
+      return `${baseStyles} bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400`;
     default:
-      return `${baseStyles} bg-gray-50 text-gray-700`;
+      return `${baseStyles} bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400`;
   }
 };
 
@@ -176,14 +1632,12 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
     e.stopPropagation();
 
     if (call.recording_url) {
-      // Create a temporary anchor element
       const link = document.createElement("a");
       link.href = call.recording_url;
-      link.download = `call-${call.call_id}.wav`; // Suggested filename
-      link.target = "_blank"; // Open in new tab if download fails
+      link.download = `call-${call.call_id}.wav`;
+      link.target = "_blank";
       link.rel = "noopener noreferrer";
 
-      // Append to document, click, and remove
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -198,7 +1652,6 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
         e.key === "ArrowLeft" ||
         e.key === "ArrowRight"
       ) {
-        // Handle navigation
         console.log("Navigate with:", e.key);
       }
       if (e.key === "Escape") {
@@ -222,40 +1675,46 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
   }, []);
 
   return (
-    <div className="fixed inset-y-0 right-0 w-[440px] bg-white shadow-lg overflow-y-auto">
-      <div className="p-3 flex items-center justify-between border-b">
-        <div className="text-xs text-gray-500">
-          Use <kbd className="px-1 py-0.5 bg-gray-100 rounded">↑</kbd>{" "}
-          <kbd className="px-1 py-0.5 bg-gray-100 rounded">↓</kbd> to navigate
+    <div className="fixed inset-0 lg:inset-y-0 lg:right-0 lg:w-[440px] w-full bg-white dark:bg-[#141414] shadow-lg overflow-y-auto z-50">
+      <div className="p-3 sm:p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+        <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+          <span className="hidden sm:inline">
+            Use <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">↑</kbd>{" "}
+            <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">↓</kbd> to navigate
+          </span>
+          <span className="sm:hidden">Call Details</span>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-          <X size={16} />
+        <button 
+          onClick={onClose} 
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
+        >
+          <X size={20} className="sm:w-4 sm:h-4" />
         </button>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 sm:p-6">
         {/* Call Header */}
-        <div className="mb-4">
-          <h2 className="text-base font-medium mb-1">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-base font-medium mb-2 sm:mb-1 dark:text-white">
             {formatTimestamp(call.start_timestamp)}{" "}
             {call.call_type || "Unknown"}
           </h2>
-          <div className="text-xs text-gray-500 space-y-1">
+          <div className="text-sm sm:text-xs text-gray-500 dark:text-gray-400 space-y-2 sm:space-y-1">
             <div className="flex items-center space-x-2">
               <span>Agent</span>
-              <span className="text-gray-400">{call.agent_id}</span>
+              <span className="text-gray-400 dark:text-gray-500 truncate">{call.agent_id}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span>Call ID</span>
-              <span className="text-gray-400">{call.call_id}</span>
+              <span className="text-gray-400 dark:text-gray-500 truncate flex-1">{call.call_id}</span>
               <button
                 onClick={handleCopyCallId}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
               >
-                <Copy size={12} />
+                <Copy size={14} className="sm:w-3 sm:h-3" />
               </button>
             </div>
-            <div>
+            <div className="text-sm sm:text-xs">
               Duration: {formatTimestamp(call.start_timestamp)} -{" "}
               {formatTimestamp(call.end_timestamp)}
             </div>
@@ -264,21 +1723,21 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
 
         {/* Audio Player */}
         {call.recording_url && (
-          <div className="bg-gray-50 p-2 rounded mb-4">
+          <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-2 rounded mb-4 sm:mb-6">
             <audio
               ref={audioRef}
               src={call.recording_url}
               onTimeUpdate={handleTimeUpdate}
               onEnded={() => setIsPlaying(false)}
             />
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 sm:space-x-2">
               <button
                 onClick={handlePlayPause}
-                className="p-1 text-gray-600 hover:text-gray-800"
+                className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
               >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                {isPlaying ? <Pause size={20} className="sm:w-4 sm:h-4" /> : <Play size={20} className="sm:w-4 sm:h-4" />}
               </button>
-              <div className="flex-1 h-1 bg-gray-200 rounded-full">
+              <div className="flex-1 h-2 sm:h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
                 <div
                   className="h-full bg-blue-600 rounded-full"
                   style={{ width: `${audioProgress}%` }}
@@ -289,12 +1748,12 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
                 onMouseEnter={handleVolumeMouseEnter}
                 onMouseLeave={handleVolumeMouseLeave}
               >
-                <button className="p-1 text-gray-600 hover:text-gray-800">
-                  <Volume2 size={16} />
+                <button className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">
+                  <Volume2 size={20} className="sm:w-4 sm:h-4" />
                 </button>
                 {isVolumeHovered && (
                   <div
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white p-2 rounded shadow-lg"
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-gray-800 p-2 rounded shadow-lg border dark:border-gray-700"
                     onMouseEnter={handleSliderMouseEnter}
                     onMouseLeave={handleSliderMouseLeave}
                   >
@@ -305,50 +1764,50 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
                       step="0.1"
                       value={volume}
                       onChange={handleVolumeChange}
-                      className="w-24 h-1 bg-gray-200 rounded-full appearance-none cursor-pointer"
+                      className="w-24 h-1 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer"
                     />
                   </div>
                 )}
               </div>
               <button
                 onClick={handleDownloadAudio}
-                className="p-1 text-gray-600 hover:text-gray-800"
+                className="p-2 sm:p-1 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
               >
-                <Download size={16} />
+                <Download size={20} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
         )}
 
         {/* Conversation Analysis */}
-        <div className="mb-4">
-          <h3 className="text-xs font-medium mb-2">Conversation Analysis</h3>
-          <div className="space-y-2">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 dark:text-white">Conversation Analysis</h3>
+          <div className="space-y-3 sm:space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">Call Successful</span>
-              <span className="px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">
+              <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">Call Successful</span>
+              <span className="px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
                 {call.call_analysis.call_successful ? "Complete" : "Incomplete"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">User Sentiment</span>
+              <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">User Sentiment</span>
               <span
-                className={`px-2 py-0.5 text-xs rounded-full ${
+                className={`px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full ${
                   call.call_analysis.user_sentiment === "Positive"
-                    ? "bg-green-50 text-green-700"
+                    ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                     : call.call_analysis.user_sentiment === "Negative"
-                      ? "bg-red-50 text-red-700"
-                      : "bg-gray-50 text-gray-700"
+                      ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                      : "bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"
                 }`}
               >
                 {call.call_analysis.user_sentiment}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">
+              <span className="text-sm sm:text-xs text-gray-600 dark:text-gray-400">
                 Disconnection Reason
               </span>
-              <span className="px-2 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700">
+              <span className="px-2 py-1 sm:py-0.5 text-sm sm:text-xs rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
                 {call.disconnection_reason?.replace(/_/g, " ") || "Unknown"}
               </span>
             </div>
@@ -356,42 +1815,42 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
         </div>
 
         {/* Summary */}
-        <div className="mb-4">
-          <h3 className="text-xs font-medium mb-2">Summary</h3>
-          <p className="text-xs text-gray-600">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 dark:text-white">Summary</h3>
+          <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
             {call.call_analysis.call_summary}
           </p>
         </div>
 
         {/* Transcript */}
         <div>
-          <h3 className="text-xs font-medium mb-2 flex items-center justify-between">
+          <h3 className="text-sm sm:text-xs font-medium mb-3 sm:mb-2 flex items-center justify-between dark:text-white">
             Transcription
             <button
               onClick={handleCopyTranscript}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
             >
-              <Copy size={14} />
+              <Copy size={16} className="sm:w-3.5 sm:h-3.5" />
             </button>
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4 sm:space-y-3">
             {call.transcript_object.map((entry, index) => (
-              <div key={index} className="flex items-start">
-                <div className="w-12 flex-shrink-0">
-                  <div className="text-xs font-medium text-gray-500 capitalize">
+              <div key={index} className="flex items-start space-x-3 sm:space-x-0">
+                <div className="w-16 sm:w-12 flex-shrink-0">
+                  <div className="text-sm sm:text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
                     {entry.role}:
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-800">{entry.content}</p>
+                <div className="flex-1 min-w-0 sm:ml-3">
+                  <p className="text-sm sm:text-xs text-gray-800 dark:text-gray-200 leading-relaxed">{entry.content}</p>
                   {entry.metadata?.tool_calls && (
-                    <div className="mt-1 text-xs text-blue-600">
-                      &gt; Tool Invocation: {entry.metadata.tool_calls[0]?.name}
+                    <div className="mt-1 text-sm sm:text-xs text-blue-600 dark:text-blue-400">
+                       Tool Invocation: {entry.metadata.tool_calls[0]?.name}
                     </div>
                   )}
                 </div>
-                <div className="w-8 flex-shrink-0 text-right">
-                  <span className="text-xs text-gray-400">
+                <div className="w-12 sm:w-8 flex-shrink-0 text-right">
+                  <span className="text-sm sm:text-xs text-gray-400 dark:text-gray-500">
                     {formatDuration(entry.words?.[0]?.start * 1000 || 0)}
                   </span>
                 </div>
@@ -438,7 +1897,6 @@ export function CallHistory() {
 
         setCalls(callsData);
 
-        // Calculate stats
         const total = callsData.length;
         const avgDuration =
           total > 0
@@ -474,231 +1932,274 @@ export function CallHistory() {
     return `${minutes}m${seconds}s`;
   };
 
-
-  // components/ShimmerCard.tsx
   const ShimmerCard = () => (
-  <div className="animate-pulse bg-white dark:bg-gray-400 rounded-[20px] p-4 shadow-sm border border-[#1012141A]">
-    <div className="flex items-center gap-x-2 mb-4">
-      <div className="w-10 h-10 bg-gray-200 rounded-full" />
-      <div className="flex-1 h-4 bg-gray-200 rounded" />
+    <div className="animate-pulse bg-white dark:bg-gray-800 rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A] dark:border-gray-700">
+      <div className="flex items-center gap-x-2 sm:gap-x-3 mb-4">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+      </div>
+      <div className="h-8 sm:h-10 w-3/4 ml-10 sm:ml-12 bg-gray-200 dark:bg-gray-700 rounded" />
     </div>
-    <div className="h-10 w-3/4 ml-12 bg-gray-200 rounded" />
-  </div>
-);
+  );
 
   const ShimmerRow = () => (
-  <tr className="animate-pulse">
-    {[...Array(5)].map((_, i) => (
-      <td key={i} className="px-6 py-4">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-      </td>
-    ))}
-  </tr>
-);
+    <tr className="animate-pulse">
+      {[...Array(5)].map((_, i) => (
+        <td key={i} className="px-3 sm:px-6 py-4">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        </td>
+      ))}
+    </tr>
+  );
 
-
- if (loading) {
-    return     <>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <ShimmerCard />
-      <ShimmerCard />
-      <ShimmerCard />
-    </div>
-    <div className="bg-white dark:bg-slate-200 rounded-lg shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 dark:bg-[#252525]">
-            <tr>
-              {["Time", "Call Duration", "User Sentiment", "Call Successful", "Disconnection Reason"].map((head) => (
-                <th key={head} className="px-6 py-3 text-left text-xs font-medium text-gray-500  dark:text-white uppercase tracking-wider">{head}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y dark:bg-gray-400 divide-gray-200">
-            {[...Array(6)].map((_, idx) => (
-              <ShimmerRow key={idx} />
-            ))}
-          </tbody>
-        </table>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <ShimmerCard />
+            <ShimmerCard />
+            <ShimmerCard />
+          </div>
+          <div className="bg-white dark:bg-[#141414] rounded-lg shadow-sm overflow-hidden border dark:border-gray-700">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-[#252525]">
+                  <tr>
+                    {["Time", "Call Duration", "User Sentiment", "Call Successful", "Disconnection Reason"].map((head) => (
+                      <th key={head} className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {head}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200 dark:divide-gray-700">
+                  {[...Array(6)].map((_, idx) => (
+                    <ShimmerRow key={idx} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </> 
+    );
   }
 
   return (
-    <div>
-      <div className="flex justify-between bg-white dark:bg-[#141414] dark:border-white dark:text-white items-start mb-10">
-        <h1 className="text-4xl font-medium">Call History</h1>
-        {/* date and time details will be here */}
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white mb-6 sm:mb-8 lg:mb-10 gap-4 p-4 sm:p-6 rounded-lg shadow-sm border">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium">Call History</h1>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
-     <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.4 }}
-  className="bg-white  dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
->
-          <div className="flex items-center gap-x-2">
-            <div className="flex items-center gap-x-2">
-              <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
-                <Phone className="text-gray-400" size={18} />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A]"
+          >
+            <div className="flex items-center gap-x-2 sm:gap-x-3">
+              <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+                <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+                  <Phone className="text-gray-400 dark:text-gray-500" size={16} />
+                </div>
+                <span className="text-sm sm:text-base font-medium">Total Calls</span>
               </div>
-              <span className="text-md font-medium">Total Calls</span>
-            </div>
-            {true && (
-              <span
-                className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
-              >
-                {"5.6%"}
+              <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+                5.6%
               </span>
-            )}
-          </div>
-          <div className="text-5xl font-medium ml-12">{stats.totalCalls}</div>
-        {/* </div> */}
-        </motion.div>
-       
-        {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.4 }}
-  className="  bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
->
-          <div className="flex items-center gap-x-2">
-            <div className="flex items-center gap-x-2">
-              <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
-                <Clock className="text-gray-400" size={18} />
-              </div>
-              <span className="text-md font-medium">Avg Call Duration</span>
             </div>
-            {true && (
-              <span
-                className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
-              >
-                {"5.6%"}
-              </span>
-            )}
-          </div>
-          <div className="text-5xl font-medium ml-12">
-            {formatDuration(stats.avgDuration)}
-          </div>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
+              {stats.totalCalls}
+            </div>
           </motion.div>
-        {/* </div> */}
 
-        {/* <div className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"> */}
-       <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.4 }}
-  className="  bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px] p-4 shadow-sm border border-[#1012141A]"
-> 
-          <div className="flex items-center gap-x-2">
-            <div className="flex items-center gap-x-2">
-              <div className="flex w-10 h-10 items-center justify-center   p-3 bg-[#F6F6F6] rounded rounded-full">
-                <Clock className="text-gray-400" size={18} />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A]"
+          >
+            <div className="flex items-center gap-x-2 sm:gap-x-3">
+              <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+                <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+                  <Clock className="text-gray-400 dark:text-gray-500" size={16} />
+                </div>
+                <span className="text-sm sm:text-base font-medium">Avg Call Duration</span>
               </div>
-              <span className="text-md font-medium">Negative Sentiment Ratio</span>
-            </div>
-            {true && (
-              <span
-                className={`ml-auto text-xs font-medium px-2 py-1 rounded ${true ? "text-[#36A60F] bg-[#36A60F1A]" : "text-[#E04B4B] bg-[#E04B4B1A]"}`}
-              >
-                {'5.6%'}
+              <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+                5.6%
               </span>
-            )}
-          </div>
-          <div className="text-5xl font-medium ml-12">{stats.negativeSentimentRatio.toFixed(2)}%</div>
+            </div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-medium ml-10 sm:ml-12 mt-2">
+              {formatDuration(stats.avgDuration)}
+            </div>
           </motion.div>
-        {/* </div> */}
-        
-      </div>
 
-      {/* Calls Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 dark:bg-[#252525] ">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                  Time
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                  Call Duration
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                  User Sentiment
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                  Call Successful
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                  Disconnection Reason
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200">
-              {calls.map((call) => (
-                <tr
-                  key={call.call_id}
-                  onClick={() => setSelectedCall(call)}
-                  className="hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px] p-4 sm:p-6 shadow-sm border border-[#1012141A] sm:col-span-2 lg:col-span-1"
+          >
+            <div className="flex items-center gap-x-2 sm:gap-x-3">
+              <div className="flex items-center gap-x-2 sm:gap-x-3 flex-1">
+                <div className="flex w-8 h-8 sm:w-10 sm:h-10 items-center justify-center p-2 sm:p-3 bg-[#F6F6F6] dark:bg-gray-800 rounded-full">
+                  <AlertTriangle className="text-gray-400 dark:text-gray-500" size={16} />
+                </div>
+                <span className="text-sm sm:text-base font-medium">Negative Sentiment Ratio</span>
+              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded text-[#36A60F] bg-[#36A60F1A]">
+                5.6%
+              </span>
+            </div>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
+              {stats.negativeSentimentRatio.toFixed(2)}%
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Mobile Call Cards */}
+        <div className="block sm:hidden space-y-4 mb-6">
+          {calls.map((call) => (
+            <motion.div
+              key={call.call_id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedCall(call)}
+              className="bg-white dark:bg-[#141414] rounded-lg p-4 shadow-sm border dark:border-gray-700 cursor-pointer"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1">
+                  <p className="text-sm font-medium dark:text-white">
                     {call.start_timestamp
                       ? formatDistanceToNow(new Date(call.start_timestamp), {
                           addSuffix: true,
                         })
                       : "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
-                    {formatDuration(call.duration_ms)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={getBadgeStyles(
-                        call.call_analysis?.user_sentiment,
-                        true,
-                      )}
-                    >
-                      {call.call_analysis?.user_sentiment || "Unknown"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={getBadgeStyles(
-                        call.call_analysis?.call_successful
-                          ? "Successful"
-                          : "Unsuccessful",
-                      )}
-                    >
-                      {call.call_analysis?.call_successful
-                        ? "Successful"
-                        : "Unsuccessful"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={getBadgeStyles(call.disconnection_reason)}>
-                      {call.disconnection_reason?.replace(/_/g, " ") ||
-                        "Unknown"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Duration: {formatDuration(call.duration_ms)}
+                  </p>
+                </div>
+                <span
+                  className={getBadgeStyles(
+                    call.call_analysis?.user_sentiment,
+                    true,
+                  )}
+                >
+                  {call.call_analysis?.user_sentiment || "Unknown"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span
+                  className={getBadgeStyles(
+                    call.call_analysis?.call_successful
+                      ? "Successful"
+                      : "Unsuccessful",
+                  )}
+                >
+                  {call.call_analysis?.call_successful
+                    ? "Successful"
+                    : "Unsuccessful"}
+                </span>
+                <span className={getBadgeStyles(call.disconnection_reason)}>
+                  {call.disconnection_reason?.replace(/_/g, " ") || "Unknown"}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </div>
 
-      {/* Call Details Sidebar */}
-      {selectedCall && (
-        <CallDetails
-          call={selectedCall}
-          onClose={() => setSelectedCall(null)}
-        />
-      )}
+        {/* Desktop/Tablet Table */}
+        <div className="hidden sm:block bg-white dark:bg-[#141414] rounded-lg shadow-sm overflow-hidden border dark:border-gray-700">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-[#252525]">
+                <tr>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Time
+                  </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Call Duration
+                  </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    User Sentiment
+                  </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Call Successful
+                  </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Disconnection Reason
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-[#141414] divide-y divide-gray-200 dark:divide-gray-700">
+                {calls.map((call) => (
+                  <tr
+                    key={call.call_id}
+                    onClick={() => setSelectedCall(call)}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  >
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+                      {call.start_timestamp
+                        ? formatDistanceToNow(new Date(call.start_timestamp), {
+                            addSuffix: true,
+                          })
+                        : "N/A"}
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm dark:text-white text-gray-900">
+                      {formatDuration(call.duration_ms)}
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={getBadgeStyles(
+                          call.call_analysis?.user_sentiment,
+                          true,
+                        )}
+                      >
+                        {call.call_analysis?.user_sentiment || "Unknown"}
+                      </span>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={getBadgeStyles(
+                          call.call_analysis?.call_successful
+                            ? "Successful"
+                            : "Unsuccessful",
+                        )}
+                      >
+                        {call.call_analysis?.call_successful
+                          ? "Successful"
+                          : "Unsuccessful"}
+                      </span>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <span className={getBadgeStyles(call.disconnection_reason)}>
+                        {call.disconnection_reason?.replace(/_/g, " ") ||
+                          "Unknown"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Call Details Sidebar */}
+        {selectedCall && (
+          <CallDetails
+            call={selectedCall}
+            onClose={() => setSelectedCall(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }
