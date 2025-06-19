@@ -752,6 +752,8 @@ import { useNavigate } from "react-router-dom"
 import Details from "../assets/icons/details.svg"
 import { motion } from "framer-motion"
 
+const savedStats = JSON.parse(localStorage.getItem("call_stats") || "{}");
+const  customersatifcation =100- savedStats?.customer_satisfaction ;
 interface Agent {
   id: string
   agent_name?: string
@@ -1079,9 +1081,9 @@ export function Dashboard() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <StatCard icon={Phone} label="Total Calls" value="345" change={{ value: "+8,4%", positive: true }} />
-        <StatCard icon={Clock} label="Avg Call Duration" value="1m51" change={{ value: "-3,7%", positive: false }} />
-        <StatCard icon={Smile} label="Customer satisfaction" value="82%" />
+        <StatCard icon={Phone} label="Total Calls" value={savedStats?.totalCalls} change={{ value: "+8,4%", positive: true }} />
+        <StatCard icon={Clock} label="Avg Call Duration" value={savedStats?.avgDurationDisplay} change={{ value: "-3,7%", positive: false }} />
+        <StatCard icon={Smile} label="Customer satisfaction" value={ savedStats?.csatScore} />
       </div>
     </div>
   )

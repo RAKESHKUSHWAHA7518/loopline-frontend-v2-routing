@@ -2023,6 +2023,25 @@ useEffect(() => {
 //     negativeSentimentRatio: (negativeSentimentRatio * 100).toFixed(1) + "%",
 //   };
 // };
+
+
+const calculateCustomerSatisfaction = (calls: any[]) => {
+  const totalCalls = calls.length;
+  if (totalCalls === 0) return "0%";
+
+  const satisfiedCount = calls.filter(
+    (call) => call.call_analysis?.user_sentiment === "Positive"
+  ).length;
+
+  const csatPercentage = (satisfiedCount / totalCalls) * 100;
+  return `${csatPercentage.toFixed(1)}%`;
+};
+
+// Usage
+const csatScore = calculateCustomerSatisfaction(calls);
+console.log("🎯 Customer Satisfaction:", csatScore);
+
+
 const calculateCallStats = (calls: any[]) => {
   const totalCalls = calls.length;
 
@@ -2050,10 +2069,15 @@ const calculateCallStats = (calls: any[]) => {
     totalCalls,
     avgDurationDisplay,
     negativeSentimentRatio: (negativeSentimentRatio * 100).toFixed(1) + "%",
+    csatScore
   };
 };
 // // Usage:
-const statss = calculateCallStats(calls); // ← your response array
+const statss = calculateCallStats(calls);
+localStorage.setItem("call_stats", JSON.stringify(statss));
+ 
+
+ // ← your response array
 // // console.log("📞 Total calls:", stats.totalCalls);
 // // console.log("⏱️ Avg duration (sec):", stats.avgDurationSeconds);
 // // console.log("😠 Negative Sentiment Ratio:", stats.negativeSentimentRatio);
