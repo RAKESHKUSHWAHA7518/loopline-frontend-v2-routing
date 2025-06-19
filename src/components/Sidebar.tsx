@@ -73,6 +73,111 @@
 // }
 
 
+// import { NavLink } from "react-router-dom";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   BookOpen,
+//   Phone,
+//   History,
+//   CreditCard,
+//   GitFork,
+//   LogOut,
+//   Menu,
+//   X,
+// } from "lucide-react";
+// import { signOut } from "../lib/auth";
+// import { WorkspaceDropdown } from "./WorkspaceDropdown";
+// import { DarkModeToggle } from "../context/ThemeContext";
+// import { useState } from "react";
+
+// const navItems = [
+//   { icon: LayoutDashboard, label: "Dashboard", path: "/home" },
+//   { icon: Users, label: "Agents", path: "/agents" },
+//   { icon: BookOpen, label: "Knowledge Base", path: "/knowledge-base" },
+//   { icon: Phone, label: "Phone numbers", path: "/phone-numbers" },
+//   { icon: History, label: "Call history", path: "/call-history" },
+//   { icon: CreditCard, label: "Billing", path: "/billing" },
+//   { icon: GitFork, label: "Routing", path: "/routing" },
+// ];
+
+// export function Sidebar() {
+//   const [isOpen, setIsOpen] = useState(false);
+
+//   const handleLogout = async () => {
+//     await signOut();
+//   };
+
+//   return (
+//     <>
+//       {/* Mobile toggle button */}
+//       <div className="lg:hidden fixed top-4 left-4 z-50">
+//         <button
+//           onClick={() => setIsOpen(!isOpen)}
+//           className="p-2 rounded-md bg-black text-white"
+//         >
+//           {isOpen ? <X /> : <Menu />}
+//         </button>
+//       </div>
+
+//       {/* Sidebar */}
+//       <div
+//         className={`fixed lg:static z-40 bg-black text-white flex flex-col transition-all duration-300 ease-in-out
+//         ${isOpen ? "left-0" : "-left-64"} w-64 h-full lg:left-0 lg:w-56 lg:h-screen`}
+//       >
+//         <div className="p-2.5 pt-5 pb-3">
+//           <WorkspaceDropdown />
+//         </div>
+
+//         <div className="h-0.5 w-4/5 mx-auto my-1 bg-gray-500" />
+
+//         <nav className="flex-1 overflow-y-auto px-2.5 py-3">
+//           <ul className="space-y-2">
+//             {navItems.map((item) => (
+//               <li key={item.path}>
+//                 <NavLink
+//                   to={item.path}
+//                   onClick={() => setIsOpen(false)} // close on nav click (mobile)
+//                   className={({ isActive }) =>
+//                     `flex items-center space-x-2 px-3 py-2 rounded-full transition-colors sidebar-text ${
+//                       isActive
+//                         ? "bg-blue-600 text-white font-medium"
+//                         : "text-gray-300 hover:bg-gray-900"
+//                     }`
+//                   }
+//                 >
+//                   <item.icon size={16} />
+//                   <span>{item.label}</span>
+//                 </NavLink>
+//               </li>
+//             ))}
+//           </ul>
+//         </nav>
+
+//         <div className="p-3 mt-auto">
+//           <button
+//             onClick={handleLogout}
+//             className="flex items-center space-x-2 text-gray-300 hover:text-white w-full px-3 py-2 rounded-full hover:bg-gray-900 transition-colors sidebar-text"
+//           >
+//             <LogOut size={16} />
+//             <span>Logout</span>
+//           </button>
+//           <DarkModeToggle />
+//         </div>
+//       </div>
+
+//       {/* Overlay on mobile */}
+//       {isOpen && (
+//         <div
+//           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+//           onClick={() => setIsOpen(false)}
+//         />
+//       )}
+//     </>
+//   );
+// }
+
+
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -85,6 +190,8 @@ import {
   LogOut,
   Menu,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { signOut } from "../lib/auth";
 import { WorkspaceDropdown } from "./WorkspaceDropdown";
@@ -102,7 +209,8 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // mobile drawer
+  const [isCollapsed, setIsCollapsed] = useState(false); // desktop collapse
 
   const handleLogout = async () => {
     await signOut();
@@ -123,10 +231,18 @@ export function Sidebar() {
       {/* Sidebar */}
       <div
         className={`fixed lg:static z-40 bg-black text-white flex flex-col transition-all duration-300 ease-in-out
-        ${isOpen ? "left-0" : "-left-64"} w-64 h-full lg:left-0 lg:w-56 lg:h-screen`}
+        ${isOpen ? "left-0" : "-left-64"} 
+        ${isCollapsed ? "lg:w-20" : "lg:w-56"} 
+        w-64 h-full lg:left-0 lg:h-screen`}
       >
-        <div className="p-2.5 pt-5 pb-3">
-          <WorkspaceDropdown />
+        <div className="flex items-center justify-between p-3 pt-5 pb-3">
+          {!isCollapsed && <WorkspaceDropdown />}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:block text-gray-400 hover:text-white"
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
         </div>
 
         <div className="h-0.5 w-4/5 mx-auto my-1 bg-gray-500" />
@@ -137,30 +253,39 @@ export function Sidebar() {
               <li key={item.path}>
                 <NavLink
                   to={item.path}
-                  onClick={() => setIsOpen(false)} // close on nav click (mobile)
+                  onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center space-x-2 px-3 py-2 rounded-full transition-colors sidebar-text ${
+                    `flex items-center ${
+                      isCollapsed ? "justify-center" : "space-x-2"
+                    } px-3 py-2 rounded-full transition-colors sidebar-text ${
                       isActive
                         ? "bg-blue-600 text-white font-medium"
                         : "text-gray-300 hover:bg-gray-900"
                     }`
                   }
                 >
-                  <item.icon size={16} />
-                  <span>{item.label}</span>
+                  <item.icon size={18} />
+                  {!isCollapsed && <span>{item.label}</span>}
+                  
+                  {/* {(!isCollapsed || isOpen) && <span>{item.label}</span>} */}
+
                 </NavLink>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div className="p-3 mt-auto">
+        <div className="p-3 mt-auto flex flex-col gap-2 items-center">
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-2 text-gray-300 hover:text-white w-full px-3 py-2 rounded-full hover:bg-gray-900 transition-colors sidebar-text"
+            className={`flex items-center w-full ${
+              isCollapsed ? "justify-center" : "space-x-2"
+            } text-gray-300 hover:text-white px-3 py-2 rounded-full hover:bg-gray-900 transition-colors sidebar-text`}
           >
             <LogOut size={16} />
-            <span>Logout</span>
+            {!isCollapsed && <span>Logout</span>}
+            {/* {(!isCollapsed || isOpen) && <span>Logout</span>} */}
+
           </button>
           <DarkModeToggle />
         </div>
@@ -176,3 +301,4 @@ export function Sidebar() {
     </>
   );
 }
+

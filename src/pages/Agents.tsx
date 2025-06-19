@@ -99,22 +99,22 @@
 
 //   return (
 //     <div>
-//       <div className="flex justify-between items-start mb-10">
-//         <div>
-//           <h1 className="text-4xl font-medium mb-4">Agents</h1>
-//           <p className="text-xl font-medium">
-//             Let's <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">boost your business</span> effortlessly with AI agents that get the job done!
-//           </p>
-//         </div>
-//         <button
-//           onClick={handleCreateAgent}
-//           disabled={createLoading}
-//           className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
-//         >
-//           <Plus size={16} />
-//           <span>{createLoading ? 'Creating...' : 'Create an Agent'}</span>
-//         </button>
-//       </div>
+      // <div className="flex justify-between items-start mb-10">
+      //   <div>
+      //     <h1 className="text-4xl font-medium mb-4">Agents</h1>
+      //     <p className="text-xl font-medium">
+      //       Let's <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">boost your business</span> effortlessly with AI agents that get the job done!
+      //     </p>
+      //   </div>
+      //   <button
+      //     onClick={handleCreateAgent}
+      //     disabled={createLoading}
+      //     className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+      //   >
+      //     <Plus size={16} />
+      //     <span>{createLoading ? 'Creating...' : 'Create an Agent'}</span>
+      //   </button>
+      // </div>
 
 //       {loading ? (
 //         <div className="text-center py-12 text-gray-500">Loading agents...</div>
@@ -497,24 +497,53 @@ export function Agents() {
 
   return (
     <div className="px-2 sm:px-4 py-4 max-w-screen-xl mx-auto dark:bg-[#141414] dark:text-white">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start  mb-10 gap-4">
         <div>
           <h1 className="text-2xl sm:text-4xl font-medium mb-2 sm:mb-4">Agents</h1>
-          <p className="text-base sm:text-xl font-medium">
+          <p className="text-xl font-medium">
+            Let's <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">boost your business</span> effortlessly with AI agents that get the job done!
+          </p>
+          {/* <p className="text-base sm:text-xl font-medium">
             Let's{' '}
             <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">boost your business</span>{' '}
             effortlessly with AI agents that get the job done!
-          </p>
+          </p> */}
         </div>
+        {/* <button
+          onClick={handleCreateAgent}
+          disabled={createLoading}
+          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+        >
+          <Plus size={16} />
+          <span>{createLoading ? 'Creating...' : 'Create an Agent'}</span>
+        </button> */}
         <button
           onClick={handleCreateAgent}
           disabled={createLoading}
-          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm disabled:opacity-50 font-medium"
+          className="bg-[#155EEF] text-white mb-8 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
         >
           <Plus size={16} />
           <span>{createLoading ? 'Creating...' : 'Create an Agent'}</span>
         </button>
       </div>
+
+       {/* <div className="flex justify-between items-start mb-10"> */}
+        {/* <div className="flex flex-col md:flex-row justify-between items-start  mb-10">
+        <div>
+          <h1 className="text-4xl font-medium mb-4">Agents</h1>
+          <p className="text-xl font-medium">
+            Let's <span className="bg-[#155EEF] text-white px-2 py-0.5 rounded">boost your business</span> effortlessly with AI agents that get the job done!
+          </p>
+        </div>
+        <button
+          onClick={handleCreateAgent}
+          disabled={createLoading}
+          className="bg-[#155EEF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 text-xs disabled:opacity-50 font-medium"
+        >
+          <Plus size={16} />
+          <span>{createLoading ? 'Creating...' : 'Create an Agent'}</span>
+        </button>
+      </div> */}
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -548,7 +577,7 @@ export function Agents() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white dark:bg-[#1a1a1a] dark:text-white rounded-[20px] p-6 pt-9 shadow-sm border border-[#1012141A] dark:border-gray-400 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-y-6"
+              className="bg-white dark:bg-[#1a1a1a] dark:text-white rounded-[20px] p-6 pt-9 shadow-sm border border-[#1012141A] dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-y-6"
               onClick={() => navigate(`/agents/${agent.id}?name=${encodeURIComponent(agent.agent_name || 'Single Prompt Agent')}`)}
             >
               <div className="flex items-start justify-between">

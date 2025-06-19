@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronsUpDown } from "lucide-react";
+import logo from '../assets/icons/logo1.png'
 
 interface Workspace {
   id: string;
@@ -9,9 +10,9 @@ interface Workspace {
 }
 
 const workspaces: Workspace[] = [
-  { id: "1", name: "Loopline", subtext: "X Workspace" },
-  { id: "2", name: "Personal Space", subtext: "Y Workspace" },
-  { id: "3", name: "Team Space", subtext: "Z Workspace" },
+  { id: "1", name: "Loopline", subtext: "X Workspace", logo: logo },
+  // { id: "2", name: "Personal Space", subtext: "Y Workspace" },
+  // { id: "3", name: "Team Space", subtext: "Z Workspace" },
 ];
 
 export function WorkspaceDropdown() {
@@ -22,14 +23,18 @@ export function WorkspaceDropdown() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 w-full p-3 text-white bg-[#1a1a1a] rounded-xl transition-colors group border border-1"
+        className="flex items-center space-x-2 w-full p-3 text-white bg-[#1a1a1a] rounded-xl transition-colors group border border-1 border-gray-700"
       >
-        <div className="w-7 h-7 bg-white rounded-full flex-shrink-0" />
+        {/* <div className="w-7 h-7 bg-white rounded-full flex-shrink-0" /> */}
+        <img
+          src={logo || logo}
+          alt="Workspace Logo"
+          className="w-7 h-7 rounded-full flex-shrink-0"/>
         <div className="flex-1 text-left">
           <div className="font-medium text-xs">{selectedWorkspace.name}</div>
-          <div className="text-[10px] text-gray-400">
+          {/* <div className="text-[10px] text-gray-400">
             {selectedWorkspace.subtext}
-          </div>
+          </div> */}
         </div>
         <ChevronsUpDown
           size={14}
@@ -56,7 +61,11 @@ export function WorkspaceDropdown() {
                 }}
                 className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-black/50 text-white transition-colors"
               >
-                <div className="w-6 h-6 bg-white rounded-full flex-shrink-0" />
+                {/* <div className="w-6 h-6 bg-white rounded-full flex-shrink-0" /> */}
+                 <img
+          src={workspace.logo || logo}
+          alt="Workspace Logo"
+          className="w-7 h-7 rounded-full flex-shrink-0"/>
                 <div className="text-left">
                   <div className="font-medium text-xs">{workspace.name}</div>
                   <div className="text-[10px] text-gray-400">

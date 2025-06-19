@@ -30,7 +30,7 @@ export function VoiceLanguageSelector({
           <div className="relative">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex w-full items-center justify-between rounded-[6px] border  dark:border-white border-[#1012141A]  dark:border- px-2.5 pl-8 py-1.5 text-xs font-medium text-[#646465] dark:text-white hover:bg-black/5"
+              className="flex w-full items-center justify-between rounded-[6px] border  dark:border-gray-700 border-[#1012141A]  dark:border- px-2.5 pl-8 py-1.5 text-xs font-medium text-[#646465] dark:text-white hover:bg-black/5"
             >
               <span>
                 {selectedVoice
@@ -62,7 +62,7 @@ export function VoiceLanguageSelector({
             <select
               value={selectedLanguage}
               onChange={(e) => onLanguageChange(e.target.value)}
-              className="w-full appearance-none rounded-[6px] border  bg-white dark:bg-[#141414] dark:border-white border-[#1012141A] px-2.5 pl-8 py-1.5 text-xs font-medium text-[#646465] dark:text-white outline-none"
+              className="w-full appearance-none rounded-[6px] border  bg-white dark:bg-[#141414] dark:border-gray-700 border-[#1012141A] px-2.5 pl-8 py-1.5 text-xs font-medium text-[#646465] dark:text-white outline-none"
             >
               {languages.map((lang) => (
                 <option key={lang.code} value={lang.code}>

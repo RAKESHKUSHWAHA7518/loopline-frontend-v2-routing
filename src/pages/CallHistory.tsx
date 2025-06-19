@@ -1472,6 +1472,8 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { motion } from "framer-motion";
+import axios from "axios";
+
 
 interface CallData {
   call_id: string;
@@ -1834,7 +1836,7 @@ function CallDetails({ call, onClose }: CallDetailsProps) {
             </button>
           </h3>
           <div className="space-y-4 sm:space-y-3">
-            {call.transcript_object.map((entry, index) => (
+            {call?.transcript_object?.map((entry, index) => (
               <div key={index} className="flex items-start space-x-3 sm:space-x-0">
                 <div className="w-16 sm:w-12 flex-shrink-0">
                   <div className="text-sm sm:text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
@@ -1873,6 +1875,192 @@ export function CallHistory() {
     avgDuration: 0,
     negativeSentimentRatio: 0,
   });
+  const [agentIds, setAgentIds] = useState<string[]>([]);
+const agentId = JSON.parse(localStorage.getItem("agent_ids") || "[]");
+console.log("agentIds from localStorage:", agentId);
+
+  
+  // console.log(user);
+  
+
+// const   fetchagent = async()=>{
+//   try {
+    //  const agentsResponse = await fetch(
+    //       `${import.meta.env.VITE_BACKEND_URL}/api/list-agents?user_id=${user.uid}&workspace_id=1`,
+    //     )
+
+//         console.log(agentsResponse);
+        
+//         const agentsData = await agentsResponse.json()
+//         console.log(agentsData);
+//         const agentId = agentsData?.agents?.map((agent: any) => agent.agent_id);
+//         setAgentIds(agentId);
+
+        
+//   } catch (error) {
+    
+//   }
+// }
+
+// const fetchAgentIds = async () => {
+
+//   //  const agentsResponse = await axios.get(
+//   //         `${import.meta.env.VITE_BACKEND_URL}/api/list-agents?user_id=${user.uid}&workspace_id=1`,
+//   //       )
+//   const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/list-agents?user_id=${user?.uid}&workspace_id=1`);
+//   const agentList = res.data.agents;
+//   const agentIds = agentList.map((agent: any) => agent.agent_id);
+//   console.log("Agent IDs:", agentIds);
+
+//   // Optionally fetch call history
+//   const calls = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/list`, {
+//     agent_ids: agentIds,
+//   });
+//    setCalls(calls.data);
+
+//   console.log("Calls for all agents:", calls.data);
+// };
+
+
+// useEffect(()=>{
+// // fetchagent()
+// fetchAgentIds()
+// },[])
+
+console.log(agentId);
+
+const fetchcallhistory = async () => {
+  try {
+    // const callsResponse = await axios.get( `${import.meta.env.VITE_BACKEND_URL}/api/list`)
+    // const callsData = callsResponse.data;
+    // console.log(callsData);
+     const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/list`, {
+          agent_ids: agentId, // replace as needed
+        });
+        setCalls(res.data)
+        console.log(res);
+        
+  } catch (error) {
+    
+  }
+}
+
+useEffect(() => {
+    
+      fetchcallhistory();
+    
+  },[]);
+
+  // Uncomment this section if you want to fetch calls from an external API
+
+
+
+
+//  useEffect(() => {
+//     const fetchCalls = async () => {
+//       try {
+//         const allCalls = await Promise.all(
+//           agentIds.map((agentId) =>
+//             axios.get(`https://api.retail.ai/call?agent_id=${agentId}`, {
+//               headers: {
+//                 Authorization: "Bearer YOUR_API_KEY",
+//               },
+//             })
+//           )
+//         );
+//         // Flatten results
+//         const mergedCalls = allCalls.flatMap((res) => res.data);
+//         setCalls(mergedCalls);
+//       } catch (error) {
+//         console.error("Error fetching call history:", error);
+//       }
+//     };
+
+//     fetchCalls();
+//   }, []);
+  
+
+// const fetchcallhistory = async () => {
+//   if (agentIds.length <= 1) return; // ✅ do nothing if 0 or 1
+
+//   try {
+//     const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/list`, {
+//       agent_ids: agentIds, // ✅ correct key name
+//     });
+
+//     setCalls(res.data);
+//     console.log("Fetched calls:", res.data);
+//   } catch (error) {
+//     console.error("Error fetching call history", error);
+//   }
+// };
+
+// useEffect(() => {
+//   if (  agentIds.length > 1) {
+//     fetchcallhistory();
+//   }
+// }, []);
+
+// const calculateCallStats = (calls: any[]) => {
+//   const totalCalls = calls.length;
+
+//   // Sum of all durations (ms)
+//   const totalDuration = calls.reduce((acc, call) => acc + (call.duration_ms || 0), 0);
+
+//   // Count of negative/unknown sentiment calls
+//   const negativeSentimentCount = calls.filter((call) =>
+//     call.call_analysis?.user_sentiment === "Negative" ||
+//     call.call_analysis?.user_sentiment === "Unknown"
+//   ).length;
+
+//   // Calculate metrics
+//   const avgDurationSeconds = totalCalls ? totalDuration / totalCalls / 1000 : 0;
+//   const negativeSentimentRatio = totalCalls ? negativeSentimentCount / totalCalls : 0;
+
+//   return {
+//     totalCalls,
+//     avgDurationSeconds: avgDurationSeconds.toFixed(2),
+//     negativeSentimentRatio: (negativeSentimentRatio * 100).toFixed(1) + "%",
+//   };
+// };
+const calculateCallStats = (calls: any[]) => {
+  const totalCalls = calls.length;
+
+  const totalDuration = calls.reduce((acc, call) => acc + (call.duration_ms || 0), 0);
+
+  const negativeSentimentCount = calls.filter(
+    (call) =>
+      call.call_analysis?.user_sentiment === "Negative" ||
+      call.call_analysis?.user_sentiment === "Unknown"
+  ).length;
+
+  const avgDurationSeconds = totalCalls ? totalDuration / totalCalls / 1000 : 0;
+  const negativeSentimentRatio = totalCalls ? negativeSentimentCount / totalCalls : 0;
+
+  // Conditional formatting
+  let avgDurationDisplay = "";
+  if (avgDurationSeconds < 60) {
+    avgDurationDisplay = `${avgDurationSeconds.toFixed(1)} sec`;
+  } else {
+    const avgMinutes = avgDurationSeconds / 60;
+    avgDurationDisplay = `${avgMinutes.toFixed(1)} min`;
+  }
+
+  return {
+    totalCalls,
+    avgDurationDisplay,
+    negativeSentimentRatio: (negativeSentimentRatio * 100).toFixed(1) + "%",
+  };
+};
+// // Usage:
+const statss = calculateCallStats(calls); // ← your response array
+// // console.log("📞 Total calls:", stats.totalCalls);
+// // console.log("⏱️ Avg duration (sec):", stats.avgDurationSeconds);
+// // console.log("😠 Negative Sentiment Ratio:", stats.negativeSentimentRatio);
+console.log(statss);
+
+
+
 
   useEffect(() => {
     const fetchCalls = async () => {
@@ -1894,6 +2082,7 @@ export function CallHistory() {
           ...doc.data(),
           call_id: doc.id,
         })) as CallData[];
+console.log(callsData);
 
         setCalls(callsData);
 
@@ -1986,8 +2175,10 @@ export function CallHistory() {
     );
   }
 
+  console.log(calls);
+  
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white mb-6 sm:mb-8 lg:mb-10 gap-4 p-4 sm:p-6 rounded-lg shadow-sm border">
@@ -2014,7 +2205,8 @@ export function CallHistory() {
               </span>
             </div>
             <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
-              {stats.totalCalls}
+              {/* {stats.totalCalls} */}
+              {statss.totalCalls}
             </div>
           </motion.div>
 
@@ -2036,7 +2228,8 @@ export function CallHistory() {
               </span>
             </div>
             <div className="text-2xl sm:text-3xl lg:text-4xl font-medium ml-10 sm:ml-12 mt-2">
-              {formatDuration(stats.avgDuration)}
+              {/* {formatDuration(stats.avgDuration)} */}
+              {statss?.avgDurationDisplay}
             </div>
           </motion.div>
 
@@ -2058,7 +2251,8 @@ export function CallHistory() {
               </span>
             </div>
             <div className="text-3xl sm:text-4xl lg:text-5xl font-medium ml-10 sm:ml-12 mt-2">
-              {stats.negativeSentimentRatio.toFixed(2)}%
+              {/* {stats.negativeSentimentRatio.toFixed(2)}% */}
+              {statss.negativeSentimentRatio}%
             </div>
           </motion.div>
         </div>
@@ -2120,7 +2314,7 @@ export function CallHistory() {
         <div className="hidden sm:block bg-white dark:bg-[#141414] rounded-lg shadow-sm overflow-hidden border dark:border-gray-700">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-[#252525]">
+              <thead className="bg-white dark:bg-[#252525]">
                 <tr>
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Time

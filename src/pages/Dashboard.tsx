@@ -875,6 +875,11 @@ export function Dashboard() {
           `${import.meta.env.VITE_BACKEND_URL}/api/list-agents?user_id=${user.uid}&workspace_id=1`,
         )
         const agentsData = await agentsResponse.json()
+        console.log(agentsData);
+        
+          const ids = agentsData.agents.map((agent: any) => agent.agent_id);
+          
+            localStorage.setItem("agent_ids", JSON.stringify(ids));
 
         // Fetch knowledge bases
         const kbResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/knowledge-bases?user_id=${user.uid}`)
@@ -895,7 +900,7 @@ export function Dashboard() {
   const capFirst = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "")
 
   return (
-    <div className="dark:bg-[#141414] dark:text-white min-h-screen p-4 sm:p-6 lg:p-8 bg-white text-black">
+    <div className="dark:bg-[#141414] dark:text-white min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-100 text-black">
       {/* Header Section */}
       <div className="mb-6 sm:mb-8 lg:mb-10">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4" style={{ lineHeight: "100%" }}>

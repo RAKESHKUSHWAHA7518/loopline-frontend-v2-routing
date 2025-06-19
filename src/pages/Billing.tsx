@@ -576,7 +576,7 @@ export function Billing() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white mb-6 sm:mb-8 lg:mb-10 gap-4 p-4 sm:p-6 rounded-lg shadow-sm border">

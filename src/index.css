@@ -30,3 +30,17 @@
     @apply font-bold;
   }
 }
+
+   .scrollbar-none::-webkit-scrollbar{
+      display: none;
+  }
+
+  /* Add this to your global CSS or component CSS */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}

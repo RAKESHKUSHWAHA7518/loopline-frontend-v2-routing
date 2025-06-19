@@ -14,6 +14,7 @@ import { CallHistory } from './pages/CallHistory';
 import { Routing } from './pages/Routing';
 import { Billing } from './pages/Billing';
 import { FluidInfinityLoader } from './components/FluidInfinityLoader';
+import './App.css';
 
 function AuthenticatedApp() {
   return (

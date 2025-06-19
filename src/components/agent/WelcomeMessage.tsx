@@ -40,7 +40,7 @@ export function WelcomeMessage({ message, onChange }: WelcomeMessageProps) {
       <label className="block text-md font-medium mb-2">Welcome message</label>
       <div className="mb-2 relative">
         <select
-          className="w-full px-2.5 py-1.5 border border-[#1012141A]  bg-white dark:bg-[#141414] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
+          className="w-full px-2.5 py-1.5 border border-[#1012141A]  dark:border-gray-700 bg-white dark:bg-[#141414] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
           onChange={(e) => onChange(e.target.value)}
           value={message}
         >
@@ -58,7 +58,7 @@ export function WelcomeMessage({ message, onChange }: WelcomeMessageProps) {
       <textarea
         value={message}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-2.5 py-4 h-15 text-xs text-[#646465]  bg-white dark:bg-[#141414] dark:text-white focus:ring-2 focus:ring-blue-500 outline-none border border-[#1012141A] dark:border-white rounded-[6px]"
+        className="w-full px-2.5 py-4 h-15 text-xs text-[#646465]  bg-white dark:bg-[#141414] dark:text-white focus:ring-2 focus:ring-blue-500 outline-none border border-[#1012141A] dark:border-gray-700 rounded-[6px]"
         placeholder="Enter welcome message"
       />
     </div>

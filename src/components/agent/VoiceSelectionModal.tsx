@@ -137,7 +137,7 @@ export const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center  bg-black/30">
       <div className="flex w-full max-w-4xl max-h-[80vh] flex-col rounded-xl bg-white  shadow-xl dark:bg-[#1E1E1E]">
         {/* header */}
-        <div className="flex items-center justify-between border-b border-[#1012141A] dark:border-white px-6 py-4">
+        <div className="flex items-center justify-between border-b border-[#1012141A] dark:border-gray-700 px-6 py-4">
           <h2 className="text-lg font-semibold">Select Voice</h2>
           <button
             aria-label="Close voice picker"
@@ -177,7 +177,7 @@ export const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
           <select
             value={genderFilter}
             onChange={(e) => setGenderFilter(e.target.value)}
-            className="min-w-[120px] rounded-[6px] border bg-white dark:bg-[#141414] border-[#1012141A] dark:border-white px-3 py-2 text-sm outline-none"
+            className="min-w-[120px] rounded-[6px] border bg-white dark:bg-[#141414] border-[#1012141A] dark:border-gray-700 px-3 py-2 text-sm outline-none"
           >
             <option value="">Gender</option>
             <option value="male">Male</option>
@@ -187,7 +187,7 @@ export const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
           <select
             value={accentFilter}
             onChange={(e) => setAccentFilter(e.target.value)}
-            className="min-w-[120px] rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-white px-3 py-2 text-sm outline-none"
+            className="min-w-[120px] rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-gray-700 px-3 py-2 text-sm outline-none"
           >
             <option value="">Accent</option>
             {uniqueFrom("accent").map((a) => (
@@ -198,7 +198,7 @@ export const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
           <select
             value={ageFilter}
             onChange={(e) => setAgeFilter(e.target.value)}
-            className="min-w-[120px] rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-white px-3 py-2 text-sm outline-none"
+            className="min-w-[120px] rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-gray-700 px-3 py-2 text-sm outline-none"
           >
             <option value="">Types</option>
             {uniqueFrom("age").map((a) => (
@@ -210,12 +210,12 @@ export const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="flex-1 rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-white px-3 py-2 text-sm outline-none"
+            className="flex-1 rounded-[6px] border border-[#1012141A]  bg-white dark:bg-[#141414] dark:border-gray-700 px-3 py-2 text-sm outline-none"
           />
         </div>
 
         {/* table header */}
-        <div className="grid grid-cols-[40px_1fr_2fr_1fr] items-center gap-4 border-b border-[#1012141A] bg-[#F7F7F7] dark:border-white dark:bg-[#141414] px-6 py-2 text-xs font-semibold">
+        <div className="grid grid-cols-[40px_1fr_2fr_1fr] items-center gap-4 border-b border-[#1012141A] bg-[#F7F7F7] dark:border-gray-700 dark:bg-[#141414] px-6 py-2 text-xs font-semibold">
           <span />
           <span>Voice</span>
           <span>Trait</span>

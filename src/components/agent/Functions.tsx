@@ -143,7 +143,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
   };
 
   return (
-    <div className=" text-black dark:text-white bg-white dark:bg-[#1a1a1a]">
+    <div className=" text-black dark:text-white bg-white dark:bg-[#141414]">
       <div className="flex flex-col gap-2 items-start mb-2">
         <p className="text-xs">
           Enable your agent with capabilities such as calendar bookings, call
@@ -202,7 +202,12 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
         onClose={() => setIsDialogOpen(false)}
         title={`${editingTool ? "Edit" : "Add"} Function`}
       >
-        <form className="space-y-4" onSubmit={handleSave}>
+        {/* <form className="space-y-4" onSubmit={handleSave}> */}
+        <div className="max-h-[60vh] overflow-hidden scrollbar-none flex flex-col">
+  <form
+    className="space-y-4 overflow-y-auto pr-2 flex-1 scrollbar-none"
+    onSubmit={handleSave}
+  >
           <div>
             <label className="block text-xs font-medium mb-1">Name</label>
             <input
@@ -210,7 +215,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
               required
               value={newTool.name}
               onChange={(e) => setNewTool({ ...newTool, name: e.target.value })}
-              className="w-full px-2.5 py-1.5 border  bg-white dark:bg-[#141414] dark:border-white border-[#1012141A]  rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
+              className="w-full px-2.5 py-1.5 border  bg-white dark:bg-[#141414] dark:border-gray-700 border-[#1012141A]  rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
               placeholder="Enter function name"
             />
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
@@ -221,7 +226,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
             <select
               value={newTool.type}
               onChange={(e) => setNewTool({ ...newTool, type: e.target.value })}
-              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
+              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] dark:text-white"
             >
               <option value="custom">Custom Function</option>
               <option value="enable_routing">Enable Routing</option>
@@ -252,7 +257,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
                 onChange={(e) =>
                   setNewTool({ ...newTool, description: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] h-24"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] h-24"
                 placeholder="Enter function description"
               />
             </div>
@@ -269,7 +274,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
                   onChange={(e) =>
                     setNewTool({ ...newTool, url: e.target.value })
                   }
-                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                   placeholder="Enter function URL"
                 />
               </div>
@@ -295,7 +300,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
                       timeout_ms: parseInt(e.target.value),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                   placeholder="Enter timeout in milliseconds"
                 />
               </div>
@@ -319,13 +324,13 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
                 onChange={(e) =>
                   setNewTool({ ...newTool, number: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-[#141414] dark:border-white dark:text-white border border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="Enter phone number"
               />
             </div>
           )}
 
-          <div className="space-y-4 border-t border-gray-200 pt-4">
+          <div className="space-y-4 border-t border-gray-200  dark:border-gray-700 pt-4">
             <h4 className="text-sm font-medium text-gray-700 dark:text-white">
               Speech Settings
             </h4>
@@ -381,6 +386,7 @@ export function Functions({ tools = [], onUpdate }: FunctionsProps) {
             </button>
           </div>
         </form>
+        </div>
       </Dialog>
     </div>
   );

@@ -395,7 +395,7 @@ export function UpdateAgent() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/2 lg:w-6/12 p-6 overflow-auto dark:bg-[#141414]  dark:text-white bg-white rounded-[20px]   border border-[#1012141A]  dark:border-white shadow-sm flex flex-col gap-y-6">
+        <div className="w-full md:w-1/2 lg:w-6/12 p-6 overflow-auto dark:bg-[#141414]  dark:text-white bg-white rounded-[20px]   border border-[#1012141A]  dark:border-gray-700 shadow-sm flex flex-col gap-y-6">
           <VoiceLanguageSelector
             voices={voices}
             selectedVoiceId={agentData.voice_id}
@@ -421,14 +421,14 @@ export function UpdateAgent() {
           />
         </div>
 
-        <div className="w-full md:w-1/4 lg:w-3/12 mt-6 md:mt-0 p-6 overflow-auto bg-white dark:bg-[#1a1a1a] rounded-[20px] shadow-sm border border-[#1012141A]  dark:border-white">
+        <div className="w-full md:w-1/4 lg:w-3/12 mt-6 md:mt-0 p-6 overflow-auto bg-white dark:bg-[#141414] rounded-[20px] shadow-sm border border-[#1012141A]  dark:border-gray-700">
           <KnowledgeBaseSidebar
             agentData={agentData}
             onUpdateAgent={handleUpdateAgent}
           />
         </div>
 
-        <div className="w-full md:w-1/4 lg:w-3/12 mt-6 md:mt-0 p-6 overflow-auto bg-white  dark:bg-[#141414] dark:border-white dark:text-white rounded-[20px]  border border-[#1012141A] shadow-sm">
+        <div className="w-full md:w-1/4 lg:w-3/12 mt-6 md:mt-0 p-6 overflow-auto bg-white  dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-[20px]  border border-[#1012141A] shadow-sm">
           <TestCallSidebar
             isCallActive={isCallActive}
             onToggleCall={handleToggleCall}

@@ -143,7 +143,7 @@ const CustomFunction: React.FC<CustomFunctionProps> = ({
         required
         value={inputSchema}
         onChange={(e) => setInputSchema(e.target.value)}
-        className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] h-40"
+        className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465] h-40"
         placeholder="Enter JSON schema here..."
       />
       <button

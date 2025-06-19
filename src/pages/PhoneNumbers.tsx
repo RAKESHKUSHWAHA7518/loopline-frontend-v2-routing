@@ -219,6 +219,7 @@ export function PhoneNumbers() {
       if (!response.ok) {
         throw new Error("Failed to initiate outbound call");
       }
+console.log(response);
 
       // Reset and close dialog on success
       setToPhoneNumber("");
@@ -324,7 +325,7 @@ export function PhoneNumbers() {
     //     </div>
     //   </div>
     <div className="px-2 sm:px-4 py-4 max-w-screen-xl mx-auto">
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10 bg-white dark:bg-[#141414] dark:border-white dark:text-white">
+    <div className="flex flex-col lg:flex-row justify-between items-start  gap-4 mb-10 bg-gray-100 dark:bg-[#141414] dark:border-gray-700 dark:text-white">
       <h1 className="text-2xl sm:text-4xl font-medium">Phone numbers</h1>
       <div className="relative" ref={dropdownRef}>
         <button
@@ -337,7 +338,7 @@ export function PhoneNumbers() {
         </button>
 
         {isAddDropdownOpen && (
-          <div className="absolute right-0 mt-1 w-56 bg-white dark:bg-[#141414] dark:border-white dark:text-white rounded-lg shadow-lg border border-gray-200 z-10">
+          <div className="absolute right-0 mt-1 w-56 bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white rounded-lg shadow-lg border border-gray-200 z-10">
             <div className="py-1">
               <button
                 onClick={() => {
@@ -540,7 +541,7 @@ export function PhoneNumbers() {
               onChange={(e) =>
                 setAreaCode(e.target.value ? Number(e.target.value) : "")
               }
-              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
               placeholder="415"
             />
           </div>
@@ -585,7 +586,7 @@ export function PhoneNumbers() {
               type="tel"
               value={toPhoneNumber}
               onChange={(e) => setToPhoneNumber(e.target.value)}
-              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
               placeholder="e.g. +11234567890"
             />
             <p className="text-gray-500 dark:text-white text-xs mt-2">
@@ -633,7 +634,7 @@ export function PhoneNumbers() {
         }}
         title="Import SIP Trunk Number"
       >
-        <div className="space-y-4 max-h-96 overflow-y-auto">
+        <div className="space-y-4 max-h-96 scrollbar-none overflow-y-auto">
           {sipTrunkError && (
             <p className="bg-red-50 text-red-600 p-2 rounded-md text-xs">
               {sipTrunkError}
@@ -651,7 +652,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, phone_number: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="e.g. +14157774444"
               />
             </div>
@@ -666,7 +667,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, nickname: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="e.g. Frontdesk Number"
               />
             </div>
@@ -681,7 +682,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, termination_uri: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="e.g. someuri.pstn.twilio.com"
               />
             </div>
@@ -696,7 +697,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, sip_trunk_auth_username: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="Enter username"
               />
             </div>
@@ -711,7 +712,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, sip_trunk_auth_password: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="Enter password"
               />
             </div>
@@ -726,7 +727,7 @@ export function PhoneNumbers() {
                   onChange={(e) =>
                     setSipTrunkData({ ...sipTrunkData, inbound_agent_id: e.target.value })
                   }
-                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 >
                   <option value="">Select agent</option>
                   {agents.map((agent) => (
@@ -752,7 +753,7 @@ export function PhoneNumbers() {
                   onChange={(e) =>
                     setSipTrunkData({ ...sipTrunkData, outbound_agent_id: e.target.value })
                   }
-                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                  className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 >
                   <option value="">Select agent</option>
                   {agents.map((agent) => (
@@ -778,7 +779,7 @@ export function PhoneNumbers() {
                 onChange={(e) =>
                   setSipTrunkData({ ...sipTrunkData, inbound_webhook_url: e.target.value })
                 }
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                 placeholder="e.g. https://example.com/inbound-webhook"
               />
             </div>

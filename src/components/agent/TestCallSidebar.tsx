@@ -30,7 +30,7 @@ export function TestCallSidebar({
   const showTranscriptView = isCallActive || transcript.length > 0;
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center text-black dark:text-white">
       <div className="flex justify-center w-full mb-4 relative">
         <div className="flex items-center gap-1">
           <Phone size={16} color="#101214" />
@@ -41,15 +41,15 @@ export function TestCallSidebar({
       {showTranscriptView ? (
         <div
           ref={transcriptContainerRef}
-          className="w-full max-h-[30rem] overflow-y-auto mb-6 border-b"
+          className="w-full max-h-[30rem] overflow-y-auto scrollbar-none mb-6 border-b"
         >
           {transcript.map((message) => (
             <div
               key={message.id}
               className={`mb-3 p-3 rounded-lg text-xs ${
                 message.role === "user"
-                  ? "bg-gray-100 ml-8"
-                  : "bg-green-100 mr-8"
+                  ? "bg-gray-200 dark:bg-gray-600 ml-8"
+                  : "bg-blue-100 mr-8 text-black dark:text-black dark:bg-blue-600"
               }`}
             >
               <div className="font-semibold mb-1">
@@ -60,7 +60,7 @@ export function TestCallSidebar({
           ))}
 
           {isCallActive && transcript.length > 0 && (
-            <div className="text-[10px] text-gray-500 text-center mt-2">
+            <div className="text-[10px] text-gray-500 dark:text-white text-center mt-2">
               Call in progress...
             </div>
           )}

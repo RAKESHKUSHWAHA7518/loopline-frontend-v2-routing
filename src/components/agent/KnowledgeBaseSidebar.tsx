@@ -106,7 +106,7 @@ export function KnowledgeBaseSidebar({
 
   return (
     <div>
-      <div className="border-b border-gray-200 text-black dark:text-white">
+      <div className="border-b border-gray-200 dark:border-gray-700 text-black dark:text-white">
         <button
           className="w-full pb-4 text-left"
           onClick={() => setIsKnowledgeBaseOpen(!isKnowledgeBaseOpen)}
@@ -121,7 +121,7 @@ export function KnowledgeBaseSidebar({
           </div>
         </button>
         {isKnowledgeBaseOpen && (
-          <div className="pb-4 text-black dark:text-white bg-white dark:bg-[#1a1a1a]">
+          <div className="pb-4 text-black dark:text-white bg-white dark:bg-[#141414]">
             <div className="flex flex-col gap-2 items-start mb-2">
               <p className="text-xs">
                 Add knowledge base to provide context to the agent.
@@ -167,7 +167,7 @@ export function KnowledgeBaseSidebar({
         )}
       </div>
 
-      <div className="border-t border-gray-200 text-black dark:text-white">
+      <div className="border-t border-gray-200 text-black dark:border-gray-700 dark:text-white">
         <button
           className="w-full py-4 text-left"
           onClick={() => setIsFunctionsOpen(!isFunctionsOpen)}
@@ -189,7 +189,7 @@ export function KnowledgeBaseSidebar({
         )}
       </div>
 
-      <div className="border-t text-black dark:text-white border-gray-200">
+      <div className="border-t text-black dark:text-white dark:border-gray-700 border-gray-200">
         <button
           className="w-full py-4 text-left"
           onClick={() => setIsWebhookOpen(!isWebhookOpen)}
@@ -212,7 +212,7 @@ export function KnowledgeBaseSidebar({
               type="url"
               value={webhookUrl}
               onChange={(e) => setWebhookUrl(e.target.value)}
-              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
               placeholder="Enter webhook url"
             />
             <button onClick={() => onUpdateAgent("webhook_url", webhookUrl)} disabled={webhookUrl === agentData?.webhook_url}
@@ -224,7 +224,7 @@ export function KnowledgeBaseSidebar({
         )}
       </div>
 
-      <div className="border-t text-black dark:text-white border-gray-200">
+      <div className="border-t text-black dark:text-white dark:border-gray-700 border-gray-200">
         <button
           className="w-full py-4 text-left"
           onClick={() => setIsSpeechSettingsOpen(!isSpeechSettingsOpen)}
@@ -252,7 +252,7 @@ export function KnowledgeBaseSidebar({
         )}
       </div>
 
-      <div className="border-t  dark:text-white border-gray-200">
+      <div className="border-t  dark:text-white dark:border-gray-700 border-gray-200">
         <button
           className="w-full py-4 text-left"
           onClick={() => setIsCallSettingsOpen(!isCallSettingsOpen)}
@@ -296,7 +296,7 @@ export function KnowledgeBaseSidebar({
                 <button
                   key={kb.knowledge_base_id}
                   onClick={() => handleAddKnowledgeBase(kb.knowledge_base_id)}
-                  className="w-full p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full p-3 text-left bg-gray-50 dark:bg-[#141414] hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <div className="font-medium text-sm text-gray-500 dark:text-white">
                     {kb.knowledge_base_name}

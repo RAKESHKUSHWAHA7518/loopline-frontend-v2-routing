@@ -14,7 +14,7 @@ export function Dialog({ isOpen, onClose, children, title, maxWidth = 'max-w-sm'
 
   return (
     <div className="fixed z-[1] inset-0 bg-black bg-opacity-50 overflow-y-auto">
-      <div className="min-h-full w-full flex items-center justify-center p-4">
+      <div className="min-h-full w-full flex items-center justify-center p-4  ">
         <div className={`bg-white dark:bg-[#2c2b2b]  text-black dark:text-white rounded-[20px] w-full ${maxWidth} relative`}>
           <button
             onClick={onClose}

@@ -65,7 +65,7 @@ export function SpeechSettings({
             <select
               value={ambientSound}
               onChange={(e) => onUpdate('ambient_sound', e.target.value)}
-              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"  
+              className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"  
             >
               {backgroundSoundOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -153,7 +153,7 @@ export function SpeechSettings({
           />
         </div>
         {enableBackchannel && (
-          <div className="mt-2 p-3 rounded-[10px] border border-[#6464651A] dark:border-white flex flex-col px-2 py-2.5 ">
+          <div className="mt-2 p-3 rounded-[10px] border border-[#6464651A] dark:border-gray-700 flex flex-col px-2 py-2.5 ">
               {backchannelWords.map((word, index) => (
                 <div key={index} className="text-[10px] text-[#646465] dark:text-white">
                   '{word}'
@@ -203,7 +203,7 @@ export function SpeechSettings({
                 type="text"
                 value={newWord}
                 onChange={(e) => setNewWord(e.target.value)}
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
               />
             </div>
             <div>
@@ -212,7 +212,7 @@ export function SpeechSettings({
                 type="text"
                 value={newPhoneme}
                 onChange={(e) => setNewPhoneme(e.target.value)}
-                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-white dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                className="w-full px-2.5 py-1.5 border bg-white dark:bg-[#141414] dark:border-gray-700 dark:text-white border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
               />
             </div>
             <div className="flex justify-end space-x-2">
