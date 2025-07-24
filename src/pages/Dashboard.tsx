@@ -879,7 +879,7 @@ export function Dashboard() {
         const agentsData = await agentsResponse.json()
         console.log(agentsData);
         
-          const ids = agentsData.agents.map((agent: any) => agent.agent_id);
+          const ids = agentsData.agents?.map((agent: any) => agent.agent_id);
           
             localStorage.setItem("agent_ids", JSON.stringify(ids));
 

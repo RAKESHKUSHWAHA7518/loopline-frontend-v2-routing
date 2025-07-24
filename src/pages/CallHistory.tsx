@@ -1876,7 +1876,7 @@ export function CallHistory() {
     negativeSentimentRatio: 0,
   });
   const [agentIds, setAgentIds] = useState<string[]>([]);
-const agentId = JSON.parse(localStorage.getItem("agent_ids") || "[]");
+const agentId = JSON.parse(localStorage?.getItem("agent_ids") || "[]");
 console.log("agentIds from localStorage:", agentId);
 
   

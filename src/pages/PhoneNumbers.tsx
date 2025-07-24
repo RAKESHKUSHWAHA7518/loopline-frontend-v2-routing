@@ -376,11 +376,11 @@ console.log(response);
           <p className="text-gray-500 text-lg">No phone numbers found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className=" dark:bg-gray-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {phoneNumbers.map((phoneNumber) => (
             <div
               key={phoneNumber.phone_number}
-              className="bg-white rounded-[20px] p-4 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-4 relative overflow-hidden"
+              className="bg-white  dark:text-white dark:bg-gray-800 rounded-[20px] p-4 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-4 relative overflow-hidden"
             >
               <div className="flex items-start justify-between">
                 <div className="w-full">

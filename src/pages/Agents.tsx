@@ -449,6 +449,8 @@ export function Agents() {
           edited_at: doc.data().edited_at?.toDate() || new Date(),
         })) as Agent[];
         setAgents(agentsList);
+        console.log('Fetched agents:', agentsList);
+        
       } catch (error) {
         console.error('Error fetching agents:', error);
       } finally {
