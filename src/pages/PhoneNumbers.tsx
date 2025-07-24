@@ -380,7 +380,7 @@ console.log(response);
           {phoneNumbers.map((phoneNumber) => (
             <div
               key={phoneNumber.phone_number}
-              className="bg-white  dark:text-white dark:bg-gray-800 rounded-[20px] p-4 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-4 relative overflow-hidden"
+              className="bg-white  dark:text-white  dark:bg-gray-800 rounded-[20px] p-4 shadow-sm border border-[#1012141A] hover:shadow-md transition-shadow flex flex-col gap-y-4 relative overflow-hidden"
             >
               <div className="flex items-start justify-between">
                 <div className="w-full">
@@ -413,7 +413,7 @@ console.log(response);
                     </div>
                   ) : (
                     <div className="flex items-center justify-between space-x-2 w-full">
-                      <h3 className="font-medium text-md">
+                      <h3 className="font-medium dark:text-white text-gray-500 text-md">
                         {phoneNumber.nickname}
                       </h3>
                       <button
@@ -427,7 +427,7 @@ console.log(response);
                       </button>
                     </div>
                   )}
-                  <p className="text-xs font-medium text-gray-500">
+                  <p className="text-xs font-medium dark:text-white text-gray-500">
                     {phoneNumber.phone_number_pretty}
                   </p>
                 </div>
@@ -435,7 +435,7 @@ console.log(response);
 
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium dark:text-white text-gray-700 mb-1">
                     Inbound call agent
                   </label>
                   <div className="relative">
@@ -446,7 +446,7 @@ console.log(response);
                           inbound_agent_id: e.target.value,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                      className="w-full px-2.5 py-1.5 border dark:text-white   bg-white dark:bg-gray-800 border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                     >
                       <option value="">Select agent</option>
                       {agents.map((agent) => (
@@ -463,7 +463,7 @@ console.log(response);
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium dark:text-white text-gray-700 mb-1">
                     Outbound call agent
                   </label>
                   <div className="relative">
@@ -474,7 +474,7 @@ console.log(response);
                           outbound_agent_id: e.target.value,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
+                      className="w-full px-2.5 py-1.5 border dark:text-white   bg-white dark:bg-gray-800 border-[#1012141A] rounded-[6px] appearance-none outline-none text-xs font-medium text-[#646465]"
                     >
                       <option value="">Select agent</option>
                       {agents.map((agent) => (
