@@ -376,7 +376,7 @@ console.log(response);
           <p className="text-gray-500 text-lg">No phone numbers found</p>
         </div>
       ) : (
-        <div className=" dark:bg-gray-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {phoneNumbers.map((phoneNumber) => (
             <div
               key={phoneNumber.phone_number}
