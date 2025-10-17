@@ -192,6 +192,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  PhoneCall,
 } from "lucide-react";
 import { signOut } from "../lib/auth";
 import { WorkspaceDropdown } from "./WorkspaceDropdown";
@@ -203,9 +204,10 @@ const navItems = [
   { icon: Users, label: "Agents", path: "/agents" },
   { icon: BookOpen, label: "Knowledge Base", path: "/knowledge-base" },
   { icon: Phone, label: "Phone numbers", path: "/phone-numbers" },
+  { icon: PhoneCall, label: "Batch Calling", path: "/batch-calling" },
   { icon: History, label: "Call history", path: "/call-history" },
   { icon: CreditCard, label: "Billing", path: "/billing" },
-  { icon: GitFork, label: "Routing", path: "/routing" },
+  // { icon: GitFork, label: "Routing", path: "/routing" },
 ];
 
 export function Sidebar() {

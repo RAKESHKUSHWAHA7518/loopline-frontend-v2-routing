@@ -15,6 +15,7 @@ import { Routing } from './pages/Routing';
 import { Billing } from './pages/Billing';
 import { FluidInfinityLoader } from './components/FluidInfinityLoader';
 import './App.css';
+import { BatchCalling } from './pages/BatchCalling';
 
 function AuthenticatedApp() {
   return (
@@ -25,6 +26,7 @@ function AuthenticatedApp() {
         <Route path="/agents/:agentId" element={<UpdateAgent />} />
         <Route path="/knowledge-base" element={<KnowledgeBase />} />
         <Route path="/phone-numbers" element={<PhoneNumbers />} />
+         <Route path="/batch-calling" element={<BatchCalling />} />
         <Route path="/call-history" element={<CallHistory />} />
         <Route path="/routing" element={<Routing />} />
         <Route path="/billing" element={<Billing />} />
