@@ -24,7 +24,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBSmFvAko6mjsjGaraEPvYScjec23G4dFw",
   authDomain: "loopline-2025.firebaseapp.com",
   projectId: "loopline-2025",
-  storageBucket: "loopline-2025.firebasestorage.app",
+  storageBucket: "wannes-whitelabelled.firebasestorage.app",
   messagingSenderId: "229264078863",
   appId: "1:229264078863:web:8478b07c981f3b361b0b7a",
   measurementId: "G-K13T228L8C"

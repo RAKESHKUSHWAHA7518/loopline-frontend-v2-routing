@@ -156,12 +156,17 @@ export function BatchCalling() {
 
       if (res.ok) {
         const data = await res.json();
+        console.log(data);
+        
         const phoneNumbersList =
           data.phone_numbers?.map((phone: any) => ({
             id: phone.phone_number,
             number: phone.phone_number_pretty || phone.phone_number,
             nickname: phone.nickname,
           })) || [];
+
+          console.log(phoneNumbersList);
+          
 
         // Add default number if not already present
         const hasDefaultNumber = phoneNumbersList.some(
